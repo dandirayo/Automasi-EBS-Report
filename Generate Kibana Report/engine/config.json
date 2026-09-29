@@ -1,0 +1,16 @@
+{
+    "urls": {
+        "web1_full": "https://kbnhub.bni.co.id/s/cbs/app/dashboards#/view/09f9a35d-ee51-4290-9a98-2b4729f5ec85?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-24h%2Fh,to:now))",
+        "web2_top": "https://kbnhub.bni.co.id/s/cbs/app/dashboards#/view/74f6689c-3120-4ef6-842b-0fd06f7327ad?_g=(filters:!(),refreshInterval:(pause:!f,value:300000),time:(from:now-24h,to:now))",
+        "web3_top": "https://kbnhub.bni.co.id/s/cbs/app/dashboards#/view/9ba19c88-763e-4c5f-a95d-86fea0fe09d8?_g=(filters:!(),refreshInterval:(pause:!f,value:300000),time:(from:now-24h,to:now))",
+        "web4_top": "https://kbnhub.bni.co.id/s/cbs/app/dashboards#/view/96e8bce1-f494-4df6-a5fb-c7a9fe34ddf2?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-24h%2Fh,to:now))"
+    },
+    "selectors": {
+        "export_csv_button": "button[data-test-subj='exportCsvButton']",
+        "login_indicator": "[data-test-subj='global-nav']"
+    },
+    "browser": {
+        "headless": false,
+        "timeout_ms": 60000
+    }
+}

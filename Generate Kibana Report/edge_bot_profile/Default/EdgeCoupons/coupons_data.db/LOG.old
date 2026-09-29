@@ -1,0 +1,6 @@
+2026/09/25-15:31:15.993 5820 Reusing MANIFEST C:\Users\901191\Music\Automasi EFS\Generate Kibana Report\edge_bot_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/09/25-15:31:16.014 5820 Recovering log #13
+2026/09/25-15:31:16.015 5820 Reusing old log C:\Users\901191\Music\Automasi EFS\Generate Kibana Report\edge_bot_profile\Default\EdgeCoupons/coupons_data.db/000013.log 
+2026/09/25-15:31:16.159 a54c Level-0 table #17: started
+2026/09/25-15:31:16.169 a54c Level-0 table #17: 683376 bytes OK
+2026/09/25-15:31:16.171 a54c Delete type=0 #13

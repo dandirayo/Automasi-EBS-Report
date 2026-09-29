@@ -1,0 +1,15 @@
+2026/09/25-16:12:56.304 6d64 Reusing MANIFEST C:\Users\901191\Music\Automasi EFS\Generate Kibana Report\edge_bot_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/09/25-16:12:56.310 6d64 Recovering log #16
+2026/09/25-16:12:56.313 6d64 Reusing old log C:\Users\901191\Music\Automasi EFS\Generate Kibana Report\edge_bot_profile\Default\EdgeCoupons/coupons_data.db/000016.log 
+2026/09/25-16:12:56.438 490c Level-0 table #20: started
+2026/09/25-16:12:56.445 490c Level-0 table #20: 683376 bytes OK
+2026/09/25-16:12:56.450 490c Delete type=0 #16
+2026/09/25-16:12:56.451 490c Compacting 4@0 + 1@1 files
+2026/09/25-16:12:56.470 490c Generated table #21@0: 3 keys, 683376 bytes
+2026/09/25-16:12:56.470 490c Compacted 4@0 + 1@1 files => 683376 bytes
+2026/09/25-16:12:56.471 490c compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/09/25-16:12:56.474 490c Delete type=2 #8
+2026/09/25-16:12:56.474 490c Delete type=2 #11
+2026/09/25-16:12:56.474 490c Delete type=2 #14
+2026/09/25-16:12:56.474 490c Delete type=2 #17
+2026/09/25-16:12:56.474 490c Delete type=2 #20
