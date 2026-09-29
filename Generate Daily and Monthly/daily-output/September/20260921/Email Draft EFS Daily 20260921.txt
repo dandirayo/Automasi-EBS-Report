@@ -1,0 +1,54 @@
+Selamat Pagi,
+
+Berikut kami sampaikan EFS Daily Report Summary tanggal 21 September 2026 yang mencakup Infrastructure Health, Concurrent Job, monitoring XLA, serta proses FAH sampai dengan GL.
+
+Infrastructure Health
+Kondisi infrastruktur berdasarkan utilisasi maksimum harian:
+3 server berstatus Critical.
+4 server berstatus Warning.
+1 server berstatus Healthy.
+CPU tertinggi mencapai 79.51% pada efsdbslp01 sekitar pukul 10:00.
+Memory tertinggi mencapai 69.20% dan masih di bawah threshold Warning 70%.
+Disk tertinggi mencapai 70.63% pada efsdbsdr01.
+Status Critical terutama disebabkan oleh lonjakan resource. Perlu dilakukan korelasi dengan aktivitas batch accounting, Concurrent Program, AWR/ASH, top SQL, database wait, dan blocking session pada waktu terjadinya lonjakan.
+
+Concurrent Job
+Hasil monitoring Concurrent Job mencatat:
+Total request: 22,857.
+Program unik: 116.
+Request Error: 344.
+Request Terminated: 0.
+Rincian request Error:
+Accounting Program: 125 request.
+Create Accounting: 100 request.
+Request Set Stage: 61 request.
+Print Invoice Notice: 17 request.
+Multiple Languages: 17 request.
+
+
+Monitoring XLA
+Berdasarkan GL_DATE tanggal 21 September 2026, terdapat 1,906,102 baris dengan rincian:
+XLA Success: 1,619,036 atau 84.94%.
+XLA Error: 19,277.
+XLA Validation/Void: 0.
+Event Processed: 1,614,690.
+Event Unprocessed: 4,346.
+
+Monitoring FAH dan GL
+Berdasarkan CREATION_DATE tanggal 21 September 2026, tercatat:
+Data masuk FAH: 159,170.
+FAH Success: 158,974.
+FAH Error: 196.
+Accounted: 158,638.
+FAH Success tetapi belum Accounted: 336.
+Transferred to GL: 158,638.
+Stuck in XLA: 0.
+Posted GL: 158,638.
+Unposted GL: 0.
+
+Kesimpulan
+Overall status tanggal 21 September 2026 dikategorikan CRITICAL.
+
+Catatan: Total XLA dan GL tidak dibandingkan secara langsung karena menggunakan dasar tanggal yang berbeda. Workbook XLA menggunakan GL_DATE, sedangkan workbook FAH-GL menggunakan CREATION_DATE.
+
+Demikian yang dapat kami sampaikan. Terlampir EFS Daily Health Report tanggal 21 September 2026 untuk informasi lebih lanjut.

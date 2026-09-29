@@ -1,0 +1,86 @@
+Selamat Pagi,
+
+Berikut kami sampaikan EFS Daily Report Summary tanggal 27 September 2026 yang mencakup Infrastructure Health, Concurrent Job, monitoring XLA, serta proses FAH sampai dengan GL.
+
+1. Infrastructure Health
+
+Kondisi infrastruktur berdasarkan utilisasi maksimum harian:
+
+1 server berstatus Critical.
+5 server berstatus Warning.
+2 server berstatus Healthy.
+CPU tertinggi mencapai 21,54% pada efsdbslp01.
+Memory tertinggi mencapai 70,70% dan masih di bawah threshold Warning 70%.
+Disk tertinggi mencapai 70,74% pada efsdbsdr01.
+
+Status Critical terutama disebabkan oleh lonjakan CPU pada server database dan application. Perlu dilakukan korelasi dengan aktivitas batch accounting, Concurrent Program, AWR/ASH, top SQL, database wait, dan blocking session pada waktu terjadinya lonjakan.
+
+2. Concurrent Job
+
+Hasil monitoring Concurrent Job mencatat:
+
+Total request: 18.567.
+Tidak ada program KLN hari ini.
+Terdapat beberapa program dengan waktu eksekusi tinggi, antara lain:
+Report Set: 229,72 menit.
+BNI AR Populate Line Pengembalian Sis...: 144,72 menit.
+Accounting Program: 78,21 menit.
+Request Set Stage: 43,46 menit.
+Create Accounting: 42,02 menit.
+
+Perlu dilakukan analisis lebih lanjut terhadap program dengan latency tertinggi untuk memastikan tidak terdapat dampak terhadap SLA batch dan reporting.
+
+3. Monitoring XLA
+
+Berdasarkan data tanggal 27 September 2026, terdapat 1.170.103 record dengan rincian:
+
+XLA Success: 1.170.085 atau 100,00%.
+XLA Error: 0 atau 0,00%.
+XLA Validation/Void: 18.
+Event Processed: 1.169.363.
+Event Unprocessed: 740.
+
+Event Unprocessed bukan XLA Error, namun merupakan backlog yang masih menunggu proses lanjutan dan perlu dimonitor agar tidak menghambat proses accounting berikutnya.
+
+4. Monitoring FAH dan GL
+
+Berdasarkan CREATION_DATE tanggal 27 September 2026, tercatat:
+
+Data masuk FAH: 114.976.
+FAH Success: 114.899.
+FAH Error: 76.
+Status FAH lain: 1.
+Accounted: 114.769.
+Not Accounted: 130.
+Transferred to GL: 114.769.
+Posted GL: 114.769.
+Unposted GL: 0.
+
+Rincian FAH Error:
+
+PSAK 71 Custom Application: 76.
+
+Rincian Not Accounted:
+
+ICONS Custom Application: 120.
+CREDIT CARD Custom Application: 11.
+
+Seluruh jurnal yang berhasil ditransfer ke GL telah berhasil diposting. Tidak terdapat Unposted GL.
+
+5. Catatan Rekonsiliasi
+
+Hasil rekonsiliasi menunjukkan:
+
+XLA status components vs source totals: PASS.
+GL Accounted + Not Accounted vs FAH Success: PASS.
+GL Transferred + Stuck vs Accounted: PASS.
+GL Posted + Unposted vs Transferred: PASS.
+GL Accounted DR = CR: PASS.
+
+Namun demikian, validasi detail record untuk Not Accounted tetap disarankan guna memastikan tidak terdapat perbedaan data pada level transaksi.
+
+6. Kesimpulan
+
+Overall status tanggal 27 September 2026 dikategorikan Critical karena terdapat 1 server Critical, 0 XLA Error, 740 Event Unprocessed, 76 FAH Error, dan 130 Not Accounted.
+
+Fokus tindak lanjut utama adalah penyelesaian backlog XLA, investigasi error akibat belum tersedianya Kurs Closing, serta analisis akar penyebab FAH Error dan Not Accounted untuk memastikan kelancaran proses accounting dan posting GL.

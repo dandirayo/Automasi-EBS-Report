@@ -1,0 +1,45 @@
+{
+    "gemini_api_key": "AQ.Ab8RN6IvM9mXvTLRJQA_rQubpwRPaBMdHZEuaQaJEE-Jae1fsA",
+    "telegram_bot_token": "8833404065:AAEJM6_5-_JeROJfgRM8auvxbAR-jU2w3Qw",
+    "telegram_allowed_userid": "",
+    "thresholds": {
+        "infra": {
+            "cpu_warning_pct": 60,
+            "cpu_critical_pct": 80,
+            "mem_warning_pct": 70,
+            "mem_critical_pct": 90,
+            "disk_warning_pct": 60,
+            "disk_critical_pct": 80
+        },
+        "xla": {
+            "success_warning_pct": 99.5,
+            "success_critical_pct": 95.0
+        },
+        "gl": {
+            "posted_warning_pct": 99.5,
+            "posted_critical_pct": 95.0
+        },
+        "concurrent": {
+            "error_warning_pct": 5.0,
+            "error_critical_pct": 10.0
+        }
+    },
+    "program_baselines_minutes": {
+        "BNI GL Laporan Trial Balance": 180.0,
+        "Gather Schema Statistics": 20.0,
+        "Accounting Program": 3.0,
+        "FAH Process": 5.0,
+        "Create Accounting": 3.0,
+        "Transfer Journal Entries to GL": 5.0,
+        "Journal Import": 2.0,
+        "Report Set": 80.0,
+        "BNI FAH Journal Reversal": 30.0,
+        "Validate Application Accounting Definitions": 180.0,
+        "Subledger Period Close Exceptions": 5.0,
+        "Update Subledger Accounting Balances": 3.0,
+        "Posting: Single Ledger": 2.0,
+        "OAM Dashboard Collection": 2.0,
+        "Workflow Background Process": 8.0,
+        "BNI GL Interface Kurs Harian": 3.0
+    }
+}

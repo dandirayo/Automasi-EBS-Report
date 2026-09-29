@@ -1,0 +1,99 @@
+[2026-09-18T07:00:50.008Z] [INFO] ========================================================================================================================
+[2026-09-18T07:00:50.008Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.32
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-18T07:00:50.014Z] [INFO] Telemetry session 281a4481-c8d7-4331-957c-d09d59b2d378.
+[2026-09-18T07:00:50.014Z] [INFO] Initializing cache (v1).
+[2026-09-18T07:05:25.629Z] [INFO] Shutting down.
+[2026-09-18T07:05:25.629Z] [INFO] Stopping the task scheduler and canceling any outstanding work items...
+[2026-09-18T07:05:25.629Z] [INFO] Task scheduler has stopped, and all work has been canceled.
+[2026-09-21T03:16:40.697Z] [INFO] ========================================================================================================================
+[2026-09-21T03:16:40.697Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-21T03:16:40.701Z] [INFO] Telemetry session 09b62fc1-a73a-4b21-9660-ca40180be2de.
+[2026-09-21T03:16:40.703Z] [INFO] Reinitialized cache (v1).
+[2026-09-21T03:21:18.803Z] [INFO] Shutting down.
+[2026-09-21T03:21:18.803Z] [INFO] Stopping the task scheduler and canceling any outstanding work items...
+[2026-09-21T03:21:18.804Z] [INFO] Task scheduler has stopped, and all work has been canceled.
+[2026-09-25T07:04:46.218Z] [INFO] ========================================================================================================================
+[2026-09-25T07:04:46.218Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-25T07:04:46.226Z] [INFO] Telemetry session b748056d-fed7-41b9-ac62-b0d67d28822d.
+[2026-09-25T07:04:46.227Z] [INFO] Reinitialized cache (v1).
+[2026-09-25T07:04:48.201Z] [INFO] Shutting down.
+[2026-09-25T07:04:48.201Z] [INFO] Stopping the task scheduler and canceling any outstanding work items...
+[2026-09-25T07:04:48.201Z] [INFO] Task scheduler has stopped, and all work has been canceled.
+[2026-09-25T07:05:17.108Z] [INFO] ========================================================================================================================
+[2026-09-25T07:05:17.108Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-25T07:05:17.116Z] [INFO] Telemetry session 2bc0c454-b025-4d20-9c6b-371eca891fef.
+[2026-09-25T07:05:17.116Z] [INFO] Reinitialized cache (v1).
+[2026-09-25T07:56:13.772Z] [INFO] ========================================================================================================================
+[2026-09-25T07:56:13.772Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-25T07:56:13.779Z] [INFO] Telemetry session 69796b83-02ca-41a6-a947-096f032ecc08.
+[2026-09-25T07:56:13.780Z] [INFO] Reinitialized cache (v1).
+[2026-09-25T07:57:44.812Z] [INFO] Shutting down.
+[2026-09-25T07:57:44.813Z] [INFO] Stopping the task scheduler and canceling any outstanding work items...
+[2026-09-25T07:57:44.813Z] [INFO] Task scheduler has stopped, and all work has been canceled.
+[2026-09-25T08:31:10.643Z] [INFO] ========================================================================================================================
+[2026-09-25T08:31:10.644Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-25T08:31:10.651Z] [INFO] Telemetry session 7f67c3cc-077d-452c-a9e0-8ccdb28ce197.
+[2026-09-25T08:31:10.654Z] [INFO] Reinitialized cache (v1).
+[2026-09-25T09:12:51.834Z] [INFO] ========================================================================================================================
+[2026-09-25T09:12:51.835Z] [INFO] Initializing MAM Client.
+App: com.microsoft.edge 153.0.4234.48
+SDK: 2.1.367.0
+OS: windows 10.0.26100.4770
+DeviceType: Desktop
+Manufacturer: Dell Inc.
+Model: Latitude 5450
+Telemetry: yes
+Managed device support: enabled
+[2026-09-25T09:12:51.838Z] [INFO] Telemetry session 38a2adff-678c-4fd7-a165-79c9be9751ce.
+[2026-09-25T09:12:51.839Z] [INFO] Reinitialized cache (v1).
+[2026-09-25T09:14:18.266Z] [INFO] Shutting down.
+[2026-09-25T09:14:18.266Z] [INFO] Stopping the task scheduler and canceling any outstanding work items...
+[2026-09-25T09:14:18.266Z] [INFO] Task scheduler has stopped, and all work has been canceled.

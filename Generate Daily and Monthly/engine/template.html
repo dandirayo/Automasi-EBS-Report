@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>{{ report_title | title }} - {{ report_date }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+    :root{--navy:#071a35;--navy2:#183a83;--blue:#2563eb;--cyan:#06b6d4;--green:#059669;--orange:#d97706;--red:#dc2626;--ink:#24344d;--muted:#64748b;--line:#dbe4ee;--soft:#f5f8fc;--paper:#fff}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f9f9f9;padding:20px;color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;line-height:1.5;font-size:12px}.shell{max-width:1000px;margin:auto;background:#fff;box-shadow:0 4px 15px rgba(0,0,0,0.05);border-radius:12px;overflow:hidden}
+    .hero{padding:32px 44px 28px;color:white;background:linear-gradient(120deg,#071a35 0%,#122b62 52%,#244aa5 100%);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:320px;height:320px;border:1px solid rgba(255,255,255,.1);border-radius:50%;right:-120px;top:-200px;box-shadow:0 0 0 55px rgba(255,255,255,.03),0 0 0 110px rgba(255,255,255,.02)}.eyebrow{letter-spacing:.2em;text-transform:uppercase;font-size:10px;font-weight:800;color:#a9c9ff}.hero h1{font-size:28px;font-weight:800;line-height:1.2;margin:7px 0 8px;letter-spacing:-.03em}.hero .subtitle{font-size:13px;color:#dce8ff;border-top:1px solid rgba(255,255,255,.2);padding-top:10px;max-width:860px;font-weight:500;letter-spacing:0.01em}.hero-grid{display:grid;grid-template-columns:1.2fr 1fr 1.15fr;gap:16px;margin-top:16px;color:#d1def7;font-size:11.5px}.hero-grid b{display:block;color:white;margin-bottom:2px;font-weight:700}.source-note{padding:9px 44px;background:#f2f6fd;color:#5e708d;font-size:10.5px;border-bottom:1px solid #dde7f2;font-weight:500}
+    .nav{display:flex;gap:2px;overflow-x:auto;padding:8px 44px;background:var(--navy);position:sticky;top:0;z-index:100}.nav a{color:#dbeafe;text-decoration:none;white-space:nowrap;font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:5px}.nav a:hover{background:#244aa5;color:#fff}
+    main{padding:6px 44px 40px}.section{padding:24px 0 8px}.section+.section{border-top:1px solid #e5ebf2}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:12px}.section-kicker{font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.2em;font-weight:800}.section h2{font-size:22px;font-weight:800;color:var(--navy);margin:2px 0 0;line-height:1.2;letter-spacing:-0.03em}.section-intro{max-width:760px;color:var(--muted);margin:0 0 16px;font-size:12.5px}.section-no{font-size:28px;font-weight:800;color:#dce8ff}
+    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.kpi{background:white;border:1px solid var(--line);border-radius:8px;padding:14px 12px;min-height:96px;position:relative;box-shadow:0 3px 12px rgba(15,23,42,.03)}.kpi:before{content:"";position:absolute;left:-1px;top:-1px;right:-1px;height:3px;border-radius:8px 8px 0 0;background:var(--blue)}.kpi.green:before{background:var(--green)}.kpi.orange:before{background:#f59e0b}.kpi.red:before{background:var(--red)}.kpi .label{font-size:9.5px;text-transform:uppercase;color:#64748b;font-weight:800;letter-spacing:.1em}.kpi .value{font-size:26px;line-height:1.05;margin:7px 0 4px;color:var(--navy);font-weight:800;letter-spacing:-0.04em}.kpi.green .value{color:var(--green)}.kpi.orange .value{color:#a64b08}.kpi.red .value{color:var(--red)}.kpi .sub{font-size:10.5px;color:var(--muted);font-weight:500}
+    .callout{padding:12px 16px;border-radius:8px;background:#edf5ff;border-left:4px solid var(--blue);margin:10px 0;font-size:12.5px;line-height:1.6}.callout.warning{background:#fff8e8;border-color:#f59e0b}.callout.critical{background:#fff1f1;border-color:var(--red)}.callout strong{color:var(--navy);font-weight:700}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.panel{border:1px solid var(--line);border-radius:8px;padding:16px;background:#fff;box-shadow:0 2px 10px rgba(15,23,42,.03)}.panel h3{margin:0 0 8px;color:var(--navy);font-size:14px;font-weight:700;letter-spacing:-0.02em}.panel p{margin:4px 0;color:#52627a;font-size:12px;line-height:1.6}.mini-stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e8edf3;font-size:12px}.mini-stat:last-child{border:0}.mini-stat b{color:var(--navy);font-weight:700}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:10px 0 16px}table{border-collapse:collapse;width:100%;font-size:11.5px}thead{background:var(--navy);color:white}th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:10px 8px;text-align:left;font-weight:700}td{padding:8px 8px;border-bottom:1px solid #e2e8f0;vertical-align:middle;font-size:11.5px}tbody tr:nth-child(even){background:#f8fafc}tbody tr:hover{background:#edf5ff}.right{text-align:right}.center{text-align:center}.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:9.5px;font-weight:800;white-space:nowrap;letter-spacing:0.05em;text-transform:uppercase}.badge.critical{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}.badge.warning{background:#fef3c7;color:#a64b08;border:1px solid #fde68a}.badge.healthy{background:#d1fae5;color:#047857;border:1px solid #a7f3d0}.badge.neutral{background:#e2e8f0;color:#475569}.val-crit{background:#fee2e2;color:#b91c1c;border:1px solid #f87171;font-weight:800;padding:1px 5px;border-radius:4px;display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .chart{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff;margin:10px 0;overflow:hidden}.chart-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:6px}
+    .bars{padding:6px 0}.bar-row{display:grid;grid-template-columns:minmax(140px,1.2fr) 2fr 70px;gap:8px;align-items:center;margin:5px 0;font-size:10.5px}.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar-track{height:8px;background:#eaf0f7;border-radius:999px;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,#2563eb,#06b6d4);border-radius:999px}.bar-value{text-align:right;font-weight:700;color:var(--navy)}
+    .actions{display:grid;gap:8px}.action{display:grid;grid-template-columns:60px 1fr;gap:12px;padding:12px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:7px}.action.p1{border-left-color:var(--red)}.action.p2{border-left-color:#f59e0b}.action .priority{font-weight:800;color:var(--navy);font-size:11px}.action h3{margin:0 0 3px;font-size:12px}.action p{margin:0;color:#52627a;font-size:11px}.foot{padding:16px 44px;background:var(--navy);color:#b9c8df;font-size:10px;display:flex;justify-content:space-between}.data-quality{border-left:3px solid #8b5cf6;background:#f6f2ff;padding:11px;border-radius:7px}.search{display:flex;gap:6px;align-items:center;margin-bottom:8px}.search input{flex:1;border:1px solid var(--line);padding:6px 9px;border-radius:6px;font:inherit;font-size:11px}
+    @media(max-width:900px){.hero,.source-note,main,.foot{padding-left:20px;padding-right:20px}.hero-grid,.grid-2,.grid-3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.nav{padding-left:12px}.section-head{align-items:flex-start}.section-no{display:none}.bar-row{grid-template-columns:1fr}.bar-value{text-align:left}.wide{min-width:900px}}
+    @media print{
+        body{background:white !important;padding:0 !important;font-size:10px !important}
+        .shell{box-shadow:none !important;max-width:none !important;width:100% !important;margin:0 !important; padding: 0 !important;}
+        .hero{padding:14px 24px 10px !important}
+        .hero h1{font-size:22px !important; margin: 4px 0 !important;}
+        .hero .subtitle{font-size:11.5px !important; padding-top:6px !important;}
+        .hero-grid{margin-top:8px !important; gap:8px !important; font-size:10px !important;}
+        .source-note{padding:4px 24px !important; font-size:9px !important;}
+        .nav{padding:4px 24px !important;}
+        .nav a{font-size:9.5px !important; padding:3px 6px !important;}
+        main{padding-left:24px !important;padding-right:24px !important; padding-top:2px !important; padding-bottom:10px !important;}
+        .foot{display:none !important}
+        .section{padding-top:10px !important; margin-bottom: 15px !important; break-inside: avoid !important; page-break-inside: avoid !important;}
+        .section#summary{break-inside: auto !important; page-break-inside: auto !important; padding-top:6px !important; margin-bottom: 8px !important;}
+        .section#slo{break-before: page !important; page-break-before: always !important;}
+        .section-head,.section h2,.section-kicker{break-after:avoid !important;page-break-after:avoid !important}
+        .section#summary .section-head{margin-bottom:6px !important;}
+        .section#summary h2{font-size:18px !important;}
+        .section#summary .section-intro{margin:0 0 6px !important; font-size:11px !important;}
+        
+        /* Chromium Grid Print Bug Fix */
+        .kpis{display: flex !important; flex-wrap: wrap !important; gap: 6px !important; margin: 6px 0 !important;}
+        .kpi{flex: 1 1 30% !important; min-width: 120px !important; min-height: 58px !important; padding: 7px 10px !important; break-inside: avoid !important; page-break-inside: avoid !important;}
+        .kpi .label{font-size:8px !important;}
+        .kpi .value{font-size:18px !important; margin:2px 0 !important;}
+        .kpi .sub{font-size:8.5px !important;}
+        
+        .chart-container{margin-top: 8px !important; margin-bottom: 8px !important; max-height: 195px !important;}
+        .chart-container img{max-height: 190px !important; width: 100% !important; object-fit: contain !important;}
+        .callout{padding: 6px 12px !important; margin: 6px 0 !important; font-size: 10px !important; line-height: 1.4 !important;}
+        
+        /* Section 05 GL compact styling for single page fit */
+        #gl .kpis{display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 6px !important; margin: 4px 0 8px !important;}
+        #gl .kpi{flex: none !important; min-width: 0 !important; min-height: 48px !important; padding: 5px 8px !important;}
+        #gl .kpi .label{font-size: 7.5px !important;}
+        #gl .kpi .value{font-size: 16px !important; margin: 2px 0 1px !important;}
+        #gl .kpi .sub{font-size: 8px !important;}
+        #gl .table-wrap{margin: 4px 0 8px !important;}
+        #gl th{padding: 4px 6px !important; font-size: 7.5pt !important;}
+        #gl td{padding: 3.5px 6px !important; font-size: 8pt !important;}
+        #gl .gl-rca-box{margin-top: 6px !important; padding: 8px 12px !important; font-size: 9px !important; line-height: 1.35 !important;}
+        #gl .gl-rca-box h3{font-size: 10px !important; margin: 0 0 4px !important;}
+        
+        .panel,.chart,.action,.table-wrap,tr{break-inside:avoid !important;page-break-inside:avoid !important}
+        .table-wrap{overflow:visible !important;width:100% !important}
+        .wide{min-width:0 !important;width:100% !important}
+        table{font-size:8.5pt !important;width:100% !important;table-layout:auto !important}
+        th{font-size:8pt !important;padding:6px 5px !important}
+        td{padding:5px 5px !important;font-size:8.5pt !important}
+        .search{display:none !important}
+        .foot{break-before:auto !important}
+    }
+    
+    /* Compact table first column */
+    tbody td:first-child{font-weight:600;color:var(--navy)}
+    /* Prevent row/card splitting across pages */
+    .panel,.kpi,.chart,.callout,.action,tr{break-inside:avoid;page-break-inside:avoid}
+    .table-wrap{overflow:visible}
+    </style></head>
+<body><div class="shell">
+<header class="hero"><div class="eyebrow">EFS Operations &amp; Reliability</div><h1>{{ report_title }}</h1><div class="subtitle">Infrastructure + Concurrent Program + XLA + GL Posting Funnel, Periode {{ report_date }}</div><div class="hero-grid">{% if is_dummy_mode %}<div><b>PT Bank ABCD (Persero) Tbk</b>IT Application Services</div>{% else %}<div><b>PT Bank Negara Indonesia (Persero) Tbk</b>IT Application Services (APS)</div>{% endif %}{% if is_dummy_mode %}<div><b>Departemen Core Banking System</b>Ledger: ABCD_LEDGER_IDR</div>{% else %}<div><b>Departemen Core Banking System (CBS)</b>Ledger: BNI_LEDGER_IDR</div>{% endif %}<div><b>Aplikasi dalam cakupan</b>ICONS, CREDIT CARD, CROSS BORDER PAYMENT, JOINT FINANCE</div></div></header>
+<div class="source-note"><b>Sumber:</b> EFS_Transactions_{{ date_str }}.xlsx, EFS_Infrastructures_{{ date_str }}.xlsx, EFS_XLA_{{ date_str }}.xlsx, EFS_GL_{{ date_str }}.xlsx. Seluruh angka dihitung dari empat workbook tanggal {{ report_date }}.</div>
+<nav class="nav"><a href="#summary">Ringkasan</a><a href="#slo">SLO</a><a href="#transactions">Concurrent</a><a href="#xla">XLA</a><a href="#gl">GL</a><a href="#breakdown">Breakdown</a><a href="#infra">Infrastruktur</a><a href="#impact">Dampak</a><a href="#actions">Action Items</a><a href="#audit">Audit Data</a></nav>
+<main><section class="section" id="summary"><div class="section-head"><div><div class="section-kicker">Executive Overview</div><h2>Ringkasan Eksekutif - Status {% if is_monthly %}Bulanan{% else %}Harian{% endif %}: {{ overall_status | title }}</h2></div><div class="section-no">01</div></div><p class="section-intro">Ikhtisar {% if is_monthly %}bulanan{% else %}harian{% endif %} operasional EFS. Status Critical/Warning dipicu oleh kriteria threshold pada config.json.</p><div class="kpis"><div class="kpi {{ overall_class }}"><div class="label">Overall Status</div><div class="value">{{ overall_status }}</div><div class="sub">XLA, latency, saturation</div></div><div class="kpi green"><div class="label">XLA Total Records</div><div class="value">{{ xla_total }}</div><div class="sub">Volume {% if is_monthly %}bulanan{% else %}harian{% endif %} XLA</div></div><div class="kpi green"><div class="label">XLA Success</div><div class="value">{{ xla_success_pct }}%</div><div class="sub">{{ xla_s }} records</div></div><div class="kpi {{ 'red' if xla_e != '0' else 'green' }}"><div class="label">XLA Error</div><div class="value">{{ xla_e }}</div><div class="sub">XLA code E</div></div><div class="kpi orange"><div class="label">Unprocessed</div><div class="value">{{ xla_unprocessed }}</div><div class="sub">Residual queue</div></div><div class="kpi {{ overall_class }}"><div class="label">Infrastructure</div><div class="value">{{ infra_critical_count }} Critical</div><div class="sub">{{ infra_warning_count }} Warning</div></div></div>
+{% if ai_summary %}
+<div class="data-quality" style="margin-top: 12px; border-left: 4px solid #8b5cf6; background: #f6f2ff; padding: 12px; border-radius: 8px;">
+    <h3 style="color: #6d28d9; margin: 0 0 6px; font-size: 11px; font-weight: 800;">✨ Evaluasi AI &amp; Root Cause Analysis</h3>
+    <p style="margin: 0; font-size: 10.5px; line-height: 1.5; color: #4c1d95;">{{ ai_summary | replace('\n', '<br>') | safe }}</p>
+</div>
+{% endif %}
+
+{% if not is_monthly and chart_xla_mtd %}
+<div class="chart-container" style="margin-top: 12px; margin-bottom: 12px; border: 1px solid #D4AF37; border-radius: 8px; overflow: hidden; background-color: #06152D; display: flex; justify-content: center; align-items: center; width: 100%;">
+    <img src="file:///{{ chart_xla_mtd | replace('\\', '/') }}" style="width: 100%; height: auto; display: block;" />
+</div>
+{% endif %}
+
+<div class="callout {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}"><strong>Perhatian:</strong> Pengecekan mendalam disarankan pada indikator berwarna merah atau oranye. Lihat detil metrik pada seksi selanjutnya.</div></section><section class="section" id="slo"><div class="section-head"><div><div class="section-kicker">Reliability Framework</div><h2>Glosari dan Service Level Objective</h2></div><div class="section-no">02</div></div><div class="table-wrap"><table><thead><tr><th>Sinyal</th><th>Metrik</th><th>Target</th><th>Aktual</th><th>Verdict</th></tr></thead><tbody><tr><td>Errors</td><td>XLA code success</td><td>&gt;=99,5%</td><td>{{ xla_success_pct }}%</td><td><span class="badge {{ 'warning' if xla_success_pct < '99.5' else 'healthy' }}">CHECK</span></td></tr><tr><td>Latency</td><td>Program P99</td><td>Dalam baseline</td><td>P99 Overview</td><td><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">CHECK</span></td></tr><tr><td>Saturation</td><td>CPU Max</td><td>&lt;80%</td><td>Infrastructure Overview</td><td><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">CHECK</span></td></tr><tr><td>GL</td><td>Posted / Intake</td><td>&gt;=99,5%</td><td>{{ gl_posted_rate }}%</td><td><span class="badge {{ 'warning' if gl_posted_rate < '99.5' else 'healthy' }}">CHECK</span></td></tr></tbody></table></div>
+</section><section class="section" id="transactions"><div class="section-head"><div><div class="section-kicker">Program Transactions</div><h2>Concurrent Job dan Latency Program</h2></div><div class="section-no">03</div></div><p class="section-intro">Highlight difokuskan pada proses accounting, reporting, dan kliring. Total Hits {% if is_monthly %}bulanan{% else %}harian{% endif %}: {{ trx_total_hits }} records. Top Slowest & Fastest diurutkan berdasarkan metrik persentil 95.</p>
+
+<h3 style="font-size: 12px; color: var(--navy); margin: 10px 0 6px; font-weight: 800;">🔄 Monitoring Program KLN (Kliring)</h3>
+<div class="table-wrap" style="margin-bottom: 16px;"><table class="wide"><thead><tr style="background:#f1f5f9;"><th style="padding:6px; color:#334155;">Program Name</th><th class="right" style="padding:6px; color:#334155;">Total Hit</th><th class="right" style="padding:6px; color:#334155;">P99 (mnt)</th><th style="padding:6px; width:70px; color:#334155;">Status</th></tr></thead><tbody>
+{% for row in trx_kln_rows %}
+<tr>
+    <td style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.program }}</td>
+    <td class="right" style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.hits }}</td>
+    <td class="right" style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.p99 }}</td>
+    <td style="padding:6px; border-bottom:1px solid #e2e8f0;"><span class="badge {{ 'warning' if row.status == 'Warning' else 'healthy' }}">{{ row.status }}</span></td>
+</tr>
+{% endfor %}
+{% if not trx_kln_rows %}
+<tr><td colspan="4" style="text-align:center; padding:10px; font-size:10px; color:#64748b;">Tidak ada program KLN hari ini.</td></tr>
+{% endif %}
+</tbody></table></div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <!-- Kiri: Fastest -->
+    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 11px; color: var(--green); margin: 0 0 8px; font-weight: 800;">🚀 Top 10 Fastest Programs</h3>
+        <div class="table-wrap" style="margin:0; box-shadow:none; border:1px solid #e5e7eb; border-radius: 4px;">
+            <table style="width: 100%; font-size: 9px; line-height: 1.1;">
+                <thead><tr style="background:#f0fdf4;"><th style="padding:4px 6px; color:#166534;">Program</th><th style="padding:4px 6px; color:#166534;" class="right">P95 (mnt)</th></tr></thead>
+                <tbody>
+                {% for row in trx_fastest_rows %}
+                <tr><td style="padding:4px 6px; border-bottom:1px solid #f0fdf4;">{{ row.program }}</td><td style="padding:4px 6px; border-bottom:1px solid #f0fdf4;" class="right">{{ row.p95 }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Kanan: Slowest -->
+    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 11px; color: var(--orange); margin: 0 0 8px; font-weight: 800;">🐢 Top 10 Slowest Programs</h3>
+        <div class="table-wrap" style="margin:0; box-shadow:none; border:1px solid #e5e7eb; border-radius: 4px;">
+            <table style="width: 100%; font-size: 9px; line-height: 1.1;">
+                <thead><tr style="background:#fff7ed;"><th style="padding:4px 6px; color:#9a3412;">Program</th><th style="padding:4px 6px; color:#9a3412;" class="right">P95 (mnt)</th></tr></thead>
+                <tbody>
+                {% for row in trx_slowest_rows %}
+                <tr><td style="padding:4px 6px; border-bottom:1px solid #fff7ed;">{{ row.program }}</td><td style="padding:4px 6px; border-bottom:1px solid #fff7ed;" class="right">{{ row.p95 }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</section><section class="section" id="xla"><div class="section-head"><div><div class="section-kicker">Accounting Data Integrity</div><h2>Status Data XLA dan Event Processing</h2></div><div class="section-no">04</div></div><div class="kpis"><div class="kpi green"><div class="label">Total Records</div><div class="value">{{ xla_total }}</div><div class="sub">Volume records XLA</div></div><div class="kpi orange"><div class="label">XLA=S</div><div class="value">{{ xla_s }}</div><div class="sub">{{ xla_success_pct }}%</div></div><div class="kpi green"><div class="label">XLA=V</div><div class="value">{{ xla_v }}</div><div class="sub">Invalid / Void</div></div><div class="kpi {{ 'red' if xla_e != '0' else 'green' }}"><div class="label">XLA=E</div><div class="value">{{ xla_e }}</div><div class="sub">XLA code Error</div></div><div class="kpi orange"><div class="label">Processed P</div><div class="value">{{ xla_processed }}</div><div class="sub">Status P</div></div><div class="kpi orange"><div class="label">Unprocessed U</div><div class="value">{{ xla_unprocessed }}</div><div class="sub">Status U</div></div></div><div class="callout warning"><strong>Penting:</strong> XLA=E berjumlah {{ xla_e }} record. Unprocessed berjumlah {{ xla_unprocessed }} record.</div>
+
+<div class="data-quality xla-rca-box" style="margin-top: 10px; border-left: 4px solid var(--orange); background: #fffaf0; padding: 10px 14px; border-radius: 8px;">
+    <h3 style="color: #b45309; margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: -0.01em;">
+        🔍 Analisis Aplikasi &amp; Top Error Messages XLA:
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; font-size: 10px; line-height: 1.45; color: var(--ink);">
+        <div style="background: #ffffff; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #b45309; font-size: 10px;">By Application Breakdown</b>
+            <div class="table-wrap" style="margin: 4px 0 0; border: none; box-shadow: none;">
+                <table style="width: 100%; font-size: 9px; line-height: 1.2;">
+                    <thead><tr style="background:#fef3c7; color:#92400e;"><th style="padding:4px; font-size:8px;">Aplikasi</th><th style="padding:4px; font-size:8px;">Total</th><th style="padding:4px; font-size:8px;">Success %</th></tr></thead>
+                    <tbody>
+                    {% for row in xla_app_rows %}
+                        {% if row.total != '0' %}
+                        <tr>
+                            <td style="padding:4px; border-bottom:1px solid #fef3c7;">{{ row.name }}</td>
+                            <td style="padding:4px; border-bottom:1px solid #fef3c7;">{{ row.total }}</td>
+                            <td style="padding:4px; border-bottom:1px solid #fef3c7;">{{ row.success_pct }}%</td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #b45309; font-size: 10px;">Top Error Messages XLA</b>
+            {% if xla_error_rows %}
+            <ul style="margin: 6px 0 0; padding-left: 14px; font-size: 9px; color: #475569;">
+                {% for item in xla_error_rows %}
+                <li style="margin-bottom: 4px;"><b>{{ item.app }}</b>: <i>{{ item.msg }}</i> <span class="val-crit" style="font-size: 8px; padding: 1px 4px; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;">{{ item.count }} rows</span></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="margin: 6px 0 0; color: var(--green); font-size: 9px; font-weight: 600;">Tidak ditemukan error messages pada XLA.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</section><section class="section" id="gl"><div class="section-head"><div><div class="section-kicker">General Ledger Funnel</div><h2>Monitoring FAH sampai Posting GL</h2></div><div class="section-no">05</div></div><div class="kpis"><div class="kpi green"><div class="label">Masuk FAH</div><div class="value">{{ gl_total_masuk }}</div><div class="sub">Intake</div></div><div class="kpi {{ 'red' if gl_total_error != '0' else 'green' }}"><div class="label">FAH Error</div><div class="value">{{ gl_total_error }}</div><div class="sub">Source application</div></div><div class="kpi {{ 'red' if gl_total_not_accounted != '0' else 'green' }}"><div class="label">Not Accounted</div><div class="value">{{ gl_total_not_accounted }}</div><div class="sub">Create Accounting</div></div><div class="kpi orange"><div class="label">Posted GL</div><div class="value">{{ gl_total_posted }}</div><div class="sub">{{ gl_posted_rate }}% intake</div></div><div class="kpi {{ 'red' if gl_total_unposted != '0' else 'green' }}"><div class="label">Unposted GL</div><div class="value">{{ gl_total_unposted }}</div><div class="sub">Pending Post</div></div></div><div class="table-wrap"><table><thead><tr><th>Tahap</th><th>Rows</th><th>Keterangan</th><th>Status</th></tr></thead><tbody><tr><td>Masuk FAH</td><td>{{ gl_total_masuk }}</td><td>Total Intake</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>FAH Success</td><td>{{ gl_total_success }}</td><td>Berhasil divalidasi</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>FAH Error</td><td>{% if gl_total_error != '0' %}<span class="val-crit">{{ gl_total_error }}</span>{% else %}{{ gl_total_error }}{% endif %}</td><td>{% if gl_total_error != '0' %}<span class="val-crit">Gagal divalidasi</span>{% else %}Gagal divalidasi{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_error != '0' else 'healthy' }}">{% if gl_total_error != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr><tr><td>Status Lain/Validation</td><td>{{ gl_total_other }}</td><td>Kondisi lainnya</td><td><span class="badge neutral">Info</span></td></tr><tr><td>Not Accounted</td><td>{% if gl_total_not_accounted != '0' %}<span class="val-crit">{{ gl_total_not_accounted }}</span>{% else %}{{ gl_total_not_accounted }}{% endif %}</td><td>{% if gl_total_not_accounted != '0' %}<span class="val-crit">Gagal Jurnal</span>{% else %}Gagal Jurnal{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_not_accounted != '0' else 'healthy' }}">{% if gl_total_not_accounted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr><tr><td>Accounted</td><td>{{ gl_total_accounted }}</td><td>Sukses Jurnal</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Transferred to GL</td><td>{{ gl_total_transferred }}</td><td>Ditransfer</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Posted</td><td>{{ gl_total_posted }}</td><td>Selesai Posting</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Unposted</td><td>{% if gl_total_unposted != '0' %}<span class="val-crit">{{ gl_total_unposted }}</span>{% else %}{{ gl_total_unposted }}{% endif %}</td><td>{% if gl_total_unposted != '0' %}<span class="val-crit">Belum diposting</span>{% else %}Belum diposting{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_unposted != '0' else 'healthy' }}">{% if gl_total_unposted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr></tbody></table></div><div class="table-wrap"><table class="wide"><thead><tr><th>Application</th><th>Masuk FAH</th><th>FAH Error</th><th>Not Accounted</th><th>Posted</th><th>Unposted</th></tr></thead><tbody>
+{% for row in gl_app_rows %}
+<tr>
+    <td>{{ row.name }}</td>
+    <td>{{ row.masuk_fah }}</td>
+    <td>{% if row.fah_error != '0' %}<span class="val-crit">{{ row.fah_error }}</span>{% else %}{{ row.fah_error }}{% endif %}</td>
+    <td>{% if row.not_accounted != '0' %}<span class="val-crit">{{ row.not_accounted }}</span>{% else %}{{ row.not_accounted }}{% endif %}</td>
+    <td>{{ row.posted }}</td>
+    <td>{% if row.unposted != '0' %}<span class="val-crit">{{ row.unposted }}</span>{% else %}{{ row.unposted }}{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody></table></div>
+
+<div class="data-quality gl-rca-box" style="margin-top: 10px; border-left: 4px solid var(--red); background: #fff8f8; padding: 10px 14px; border-radius: 8px;">
+    <h3 style="color: #b91c1c; margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: -0.01em;">
+        🔍 Analisis Penyebab Gagal Validasi (FAH Error) &amp; Gagal Jurnal (Not Accounted) - Berdasarkan Workbook GL:
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 10px; line-height: 1.45; color: var(--ink);">
+        <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #b91c1c; font-size: 10px;">1. Gagal Validasi (FAH Error: {{ gl_total_error }} baris)</b><br/>
+            <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Owner: Source Application</span>
+            <p style="margin: 3px 0 4px; font-size: 9px; color: #475569;">Gagal pada tahap data intake sebelum proses akuntansi:</p>
+            {% if gl_fah_error_items %}
+            <ul style="margin: 0; padding-left: 14px; font-size: 9px;">
+                {% for item in gl_fah_error_items %}
+                <li style="margin-bottom: 2px;"><b>{{ item.app }}</b>: <b>{{ item.rows }}</b> baris (<code>{{ item.msg }}</code>)</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <span style="color: var(--green); font-size: 9px; font-weight: 600;">Tidak ditemukan transaksi gagal validasi (0 baris).</span>
+            {% endif %}
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #b91c1c; font-size: 10px;">2. Gagal Jurnal (Not Accounted: {{ gl_total_not_accounted }} baris)</b><br/>
+            <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Owner: Create Accounting</span>
+            <p style="margin: 3px 0 4px; font-size: 9px; color: #475569;">Sukses divalidasi, jurnal belum terbentuk saat Create Accounting:</p>
+            {% if gl_not_accounted_items %}
+            <ul style="margin: 0; padding-left: 14px; font-size: 9px;">
+                {% for item in gl_not_accounted_items %}
+                <li style="margin-bottom: 2px;"><b>{{ item.app }}</b>: <b>{{ item.rows }}</b> baris (<i>{{ item.msg }}</i>)</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <span style="color: var(--green); font-size: 9px; font-weight: 600;">Tidak ditemukan transaksi gagal jurnal (0 baris).</span>
+            {% endif %}
+        </div>
+
+        {% if gl_unposted_items or gl_total_unposted != '0' %}
+        <div style="grid-column: 1 / -1; background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; padding: 6px 10px;">
+            <b style="color: #b91c1c; font-size: 10px;">3. Belum Diposting (Unposted GL: {{ gl_total_unposted }} baris)</b> - <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Owner: GL Period Close / Post</span>
+            <p style="margin: 2px 0 3px; font-size: 9px; color: #475569;">Jurnal telah ditransfer ke GL namun status posting masih tertunda:</p>
+            {% if gl_unposted_period_details %}
+            <ul style="margin: 0; padding-left: 14px; font-size: 9px;">
+                {% for item in gl_unposted_period_details %}
+                <li style="margin-bottom: 2px;">Periode <b>{{ item.period }}</b> (Source: {{ item.source }}): <b>{{ item.journals }}</b> jurnal</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</section><section class="section" id="breakdown"><div class="section-head"><div><div class="section-kicker">Detailed Breakdown</div><h2>Breakdown Entity, Application, dan Event Class</h2></div><div class="section-no">06</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Event Class</th><th>Total</th><th>Processed</th><th>U</th><th>Unproc %</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+{% for row in xla_entity_rows %}
+<tr>
+    <td>{{ row.code }}</td>
+    <td>{{ row.total }}</td>
+    <td>{{ row.processed }}</td>
+    <td>{{ row.unprocessed }}</td>
+    <td>{{ row.unproc_pct }}</td>
+    <td>{{ row.amount }}</td>
+    <td><span class="badge {% if row.status | upper == 'CRITICAL' %}critical{% elif row.status | upper == 'WARNING' %}warning{% else %}healthy{% endif %}">{{ row.status }}</span></td>
+</tr>
+{% endfor %}
+</tbody></table></div>
+</section><section class="section" id="financial"><div class="section-head"><div><div class="section-kicker">Financial Footprint</div><h2>Distribusi Currency dan Line Type</h2></div><div class="section-no">07</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Currency</th><th>Count</th><th>Amount</th><th>Base Amount</th></tr></thead><tbody><tr><td>USD</td><td>17.699</td><td>-23.486.136,87</td><td>4.620.821.992,85</td></tr><tr><td>SGD</td><td>2.492</td><td>116.544,57</td><td>873.114.877,55</td></tr><tr><td>HKD</td><td>301</td><td>331.694,27</td><td>713.506.842,16</td></tr><tr><td>JPY</td><td>340</td><td>7.523.297,00</td><td>459.769.945,48</td></tr><tr><td>AUD</td><td>100</td><td>51.756,95</td><td>282.603.559,83</td></tr><tr><td>EUR</td><td>235</td><td>23.701,80</td><td>280.223.208,96</td></tr><tr><td>GBP</td><td>148</td><td>7.063,93</td><td>91.147.568,71</td></tr><tr><td>MYR</td><td>186</td><td>41.636,89</td><td>85.322.212,13</td></tr><tr><td>CNY</td><td>104</td><td>58.737,91</td><td>47.056.693,41</td></tr><tr><td>SAR</td><td>69</td><td>21.735,12</td><td>43.686.041,66</td></tr><tr><td>THB</td><td>31</td><td>69.454,10</td><td>23.844.494,16</td></tr><tr><td>KRW</td><td>75</td><td>2.585.221,23</td><td>18.310.118,34</td></tr><tr><td>CAD</td><td>2</td><td>1.910,00</td><td>623.310,00</td></tr><tr><td>AED</td><td>4</td><td>330,00</td><td>277.890,00</td></tr><tr><td>BND</td><td>2</td><td>223,00</td><td>271.983,00</td></tr><tr><td>TWD</td><td>2</td><td>800,00</td><td>46.100,00</td></tr><tr><td>NZD</td><td>1</td><td>160,00</td><td>160,00</td></tr><tr><td>IDR</td><td>2.043.234</td><td>-1.860.571.765.233,00</td><td>-1.860.571.765.233,00</td></tr><tr><td>BNI_LEDGER_IDR</td><td>2.065.025</td><td>-1.860.584.417.103,10</td><td>-1.853.031.138.234,78</td></tr></tbody></table></div>
+</section><section class="section" id="infra"><div class="section-head"><div><div class="section-kicker">Infrastructure Health</div><h2>Utilisasi Server dan Tren {% if is_monthly %}Bulanan{% else %}Harian{% endif %}</h2></div><div class="section-no">08</div></div><p class="section-intro">Ringkasan utilisasi dari {{ infra_hosts_summary|length }} node. Terdapat {{ infra_critical_count }} Critical dan {{ infra_warning_count }} Warning.</p><div class="table-wrap"><table class="wide"><thead><tr><th rowspan="2">Host / Server</th><th rowspan="2">Peran</th><th colspan="3">CPU</th><th colspan="3">Memory</th><th colspan="3">Disk</th><th rowspan="2">Status</th></tr><tr><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th></tr></thead><tbody>
+{% for host, metrics in infra_hosts_summary.items() %}
+<tr>
+    <td>{{ host }}</td>
+    <td>{{ metrics.role }}</td>
+    <td>{% if metrics.cpu_min | float >= 80 %}<span class="val-crit">{{ metrics.cpu_min }}%</span>{% else %}{{ metrics.cpu_min }}%{% endif %}</td><td>{% if metrics.cpu_avg | float >= 80 %}<span class="val-crit">{{ metrics.cpu_avg }}%</span>{% else %}{{ metrics.cpu_avg }}%{% endif %}</td><td>{% if metrics.cpu_max | float >= 80 %}<span class="val-crit">{{ metrics.cpu_max }}%</span>{% else %}{{ metrics.cpu_max }}%{% endif %}</td>
+    <td>{% if metrics.mem_min | float >= 80 %}<span class="val-crit">{{ metrics.mem_min }}%</span>{% else %}{{ metrics.mem_min }}%{% endif %}</td><td>{% if metrics.mem_avg | float >= 80 %}<span class="val-crit">{{ metrics.mem_avg }}%</span>{% else %}{{ metrics.mem_avg }}%{% endif %}</td><td>{% if metrics.mem_max | float >= 80 %}<span class="val-crit">{{ metrics.mem_max }}%</span>{% else %}{{ metrics.mem_max }}%{% endif %}</td>
+    <td>{% if metrics.disk_min | float >= 80 %}<span class="val-crit">{{ metrics.disk_min }}%</span>{% else %}{{ metrics.disk_min }}%{% endif %}</td><td>{% if metrics.disk_avg | float >= 80 %}<span class="val-crit">{{ metrics.disk_avg }}%</span>{% else %}{{ metrics.disk_avg }}%{% endif %}</td><td>{% if metrics.disk_max | float >= 80 %}<span class="val-crit">{{ metrics.disk_max }}%</span>{% else %}{{ metrics.disk_max }}%{% endif %}</td>
+    <td><span class="badge {% if metrics.status | upper == 'CRITICAL' %}critical{% elif metrics.status | upper == 'WARNING' %}warning{% else %}healthy{% endif %}">{{ metrics.status }}</span></td>
+</tr>
+{% endfor %}
+</tbody></table></div>
+</section><section class="section" id="impact"><div class="section-head"><div><div class="section-kicker">Business Context</div><h2>Dampak Proses Bisnis dan Reliability Scorecard</h2></div><div class="section-no">09</div></div><div class="table-wrap"><table><thead><tr><th>Temuan Teknis</th><th>Proses Terdampak</th><th>Potensi Dampak</th><th>Severity</th></tr></thead><tbody><tr><td>{{ xla_unprocessed }} residual XLA</td><td>Create Accounting dan final sweep</td><td>Backlog dapat menunda downstream accounting.</td><td><span class="badge {{ 'warning' if xla_unprocessed != '0' else 'healthy' }}">Sedang</span></td></tr><tr><td>Latency eksekusi concurrent</td><td>Pelaporan dan batch</td><td>Risiko keterlambatan proses dan laporan.</td><td><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">Cek Alert</span></td></tr><tr><td>{{ infra_critical_count }} node Infrastruktur Critical</td><td>Batch accounting dan reporting</td><td>Risiko contention pada beban puncak.</td><td><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">Tinggi</span></td></tr><tr><td>GL Posted {{ gl_posted_rate }}%; Unposted {{ gl_total_unposted }}</td><td>Posting GL</td><td>Posting selesai, tetapi leak upstream perlu ditindaklanjuti.</td><td><span class="badge {{ 'warning' if gl_total_unposted != '0' else 'healthy' }}">Sedang</span></td></tr></tbody></table></div>
+</section><section class="section" id="actions"><div class="section-head"><div><div class="section-kicker">Prioritized Remediation</div><h2>Prioritas Perbaikan dan Action Items</h2></div><div class="section-no">10</div></div><div class="actions"><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>Drain residual queue XLA</h3><p>Terdapat {{ xla_unprocessed }} antrian XLA yang harus diproses dan {{ xla_e }} error yang perlu diselesaikan.</p></div></div><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>RCA latency lintas layer</h3><p>Korelasikan program dengan waktu proses lama terhadap utilisasi CPU, wait event, top SQL, dan antrean Concurrent Manager.</p></div></div><div class="action p2"><div class="priority">P2<br/>Hari ini</div><div><h3>Rekonsiliasi GL leak</h3><p>Tindak lanjuti {{ gl_total_error }} FAH Error dan {{ gl_total_not_accounted }} Not Accounted.</p></div></div><div class="action"><div class="priority">P3<br/>Mingguan</div><div><h3>Capacity hygiene</h3><p>Lakukan pemantauan terhadap node dengan status peringatan ({{ infra_warning_count }} node) dan kritis ({{ infra_critical_count }} node).</p></div></div></div></section><section class="section" id="audit"><div class="section-head"><div><div class="section-kicker">Traceability &amp; QA</div><h2>Rekonsiliasi dan Kualitas Data</h2></div><div class="section-no">11</div></div><div class="table-wrap"><table class=""><thead><tr><th>Pemeriksaan</th><th>Hasil</th></tr></thead><tbody><tr><td>XLA status components vs source totals</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted + Not Accounted vs FAH Success</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Transferred + Stuck vs Accounted</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Posted + Unposted vs Transferred</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted DR = CR</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Blocking Not Accounted vs funnel</td><td><span class="badge neutral">CHECK</span></td></tr></tbody></table></div><div class="data-quality"><h3>Catatan Kualitas Data</h3><p>XLA memakai GL_DATE dan GL memakai CREATION_DATE, sehingga kedua populasi dilaporkan terpisah. Status P/U dan XLA code S/E/V merupakan dimensi berbeda dan tidak dijumlahkan langsung.</p></div></section>
+{% if is_monthly %}
+<section class="section" id="top10"><div class="section-head"><div><div class="section-kicker">Monthly Evidence</div><h2>EVIDENCE XLA - TOP 10 {{ report_date | upper }}</h2></div><div class="section-no">12</div></div>
+<div class="data-quality" style="margin-bottom: 20px;"><p>Tabel berikut diambil langsung dari sheet Top 10 pada XLA bulanan. Tabel berfungsi sebagai finding dan evidence untuk konsentrasi volume, error rate, dan residual Unprocessed.</p></div>
+<h3 style="font-size: 14px; margin-bottom: 8px;">12.1 Top 10 Event Class berdasarkan volume</h3>
+<div class="table-wrap" style="margin-bottom: 20px;"><table><thead><tr><th style="width: 50px;">#</th><th>Event Class</th><th style="text-align: right;">Total Baris</th></tr></thead><tbody>
+{% for row in top10_vol %}<tr><td>{{ loop.index }}</td><td>{{ row.event }}</td><td style="text-align: right;">{{ row.value }}</td></tr>{% endfor %}
+</tbody></table></div>
+<h3 style="font-size: 14px; margin-bottom: 8px;">12.2 Top 10 Event Class berdasarkan Error %</h3>
+<div class="table-wrap" style="margin-bottom: 20px;"><table><thead><tr><th style="width: 50px;">#</th><th>Event Class</th><th style="text-align: right;">Error %</th></tr></thead><tbody>
+{% for row in top10_err %}<tr><td>{{ loop.index }}</td><td>{{ row.event }}</td><td style="text-align: right;">{{ row.value }}</td></tr>{% endfor %}
+</tbody></table></div>
+<h3 style="font-size: 14px; margin-bottom: 8px;">12.3 Top 10 residual Unprocessed</h3>
+<div class="table-wrap"><table><thead><tr><th style="width: 50px;">#</th><th>Event Class</th><th style="text-align: right;">Unprocessed</th></tr></thead><tbody>
+{% for row in top10_unp %}<tr><td>{{ loop.index }}</td><td>{{ row.event }}</td><td style="text-align: right;">{{ row.value }}</td></tr>{% endfor %}
+</tbody></table></div>
+</section>
+{% endif %}
+</main><footer class="foot"><span>{{ report_title | title }} | Confidential</span><span>Periode {{ report_date }} | Generated from validated Excel sources</span></footer>
+</div><script>
+    document.querySelectorAll('[data-filter]').forEach(input=>{
+      input.addEventListener('input',()=>{
+        const table=document.getElementById(input.dataset.filter);
+        const q=input.value.toLowerCase();
+        table.querySelectorAll('tbody tr').forEach(row=>row.style.display=row.innerText.toLowerCase().includes(q)?'':'none');
+      });
+    });
+    document.querySelectorAll('.filterable').forEach((wrap,i)=>{const t=wrap.querySelector('table');if(t)t.id='filter-table-'+i;const inp=wrap.previousElementSibling?.querySelector('input');if(inp)inp.dataset.filter=t.id;});
+    </script></body></html>

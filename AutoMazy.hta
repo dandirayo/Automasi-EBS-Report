@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>EFS Report 2026</title>
+    <HTA:APPLICATION 
+        ID="EfsLauncher" 
+        APPLICATIONNAME="EFS Report 2026" 
+        BORDER="dialog"
+        MAXIMIZEBUTTON="no"
+        SCROLL="no"
+        SINGLEINSTANCE="yes"
+        WINDOWSTATE="normal"
+        ICON="shell32.dll,43">
+    
+    <script type="text/javascript">
+        var currentDir = "";
+        
+        window.onload = function() {
+            window.resizeTo(640, 520);
+            window.moveTo((screen.width - 640) / 2, (screen.height - 520) / 2);
+            
+            var objShell = new ActiveXObject("WScript.Shell");
+            currentDir = objShell.CurrentDirectory;
+        };
+        
+        function RunDaily() {
+            var objShell = new ActiveXObject("WScript.Shell");
+            var objFSO = new ActiveXObject("Scripting.FileSystemObject");
+            var batPath = currentDir + "\\Generate Daily and Monthly\\run.bat";
+            
+            if (objFSO.FileExists(batPath)) {
+                objShell.CurrentDirectory = currentDir + "\\Generate Daily and Monthly";
+                objShell.Run('cmd.exe /c "' + batPath + '"', 1, false);
+                objShell.CurrentDirectory = currentDir;
+            } else {
+                alert("File tidak ditemukan:\n" + batPath);
+            }
+        }
+        
+        function RunKibana() {
+            var objShell = new ActiveXObject("WScript.Shell");
+            var objFSO = new ActiveXObject("Scripting.FileSystemObject");
+            var batPath = currentDir + "\\Generate Kibana Report\\run.bat";
+            
+            if (objFSO.FileExists(batPath)) {
+                objShell.CurrentDirectory = currentDir + "\\Generate Kibana Report";
+                objShell.Run('cmd.exe /c "' + batPath + '"', 1, false);
+                objShell.CurrentDirectory = currentDir;
+            } else {
+                alert("File tidak ditemukan:\n" + batPath);
+            }
+        }
+        
+        function OpenFolder() {
+            var objShell = new ActiveXObject("WScript.Shell");
+            objShell.Run('explorer.exe "' + currentDir + '"', 1, false);
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fdf3e7; /* Cream color */
+            color: #000000;
+            margin: 0;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .header-box {
+            background-color: #ffe66d;
+            border: 3px solid #000;
+            border-radius: 12px;
+            padding: 12px 35px;
+            box-shadow: 5px 5px 0px #000;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .content {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .neo-btn {
+            border: 3px solid #000;
+            border-radius: 12px;
+            width: 200px;
+            height: 120px;
+            cursor: pointer;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 5px 5px 0px #000;
+        }
+
+        .btn-daily {
+            background-color: #4ecdc4; /* Mint green */
+        }
+        
+        .btn-kibana {
+            background-color: #ff6b6b; /* Coral red */
+        }
+
+        .btn-folder {
+            background-color: #c7a4ff; /* Aesthetic Pastel Lavender */
+            width: 425px;
+            height: 54px;
+            margin-top: 24px;
+            flex-direction: row;
+            gap: 12px;
+        }
+
+        .neo-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .neo-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+        .btn-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .btn-folder .btn-icon {
+            font-size: 22px;
+            margin-bottom: 0;
+        }
+
+        .btn-text {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .footer {
+            margin-top: 28px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #7d746b; /* Aesthetic subtle text */
+            letter-spacing: 0.5px;
+        }
+        
+        button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-box">
+        <h1>EFS Report 2026</h1>
+    </div>
+    
+    <div class="content">
+        <button class="neo-btn btn-daily" onclick="RunDaily()">
+            <div class="btn-icon">📅</div>
+            <div class="btn-text">Daily and Monthly</div>
+        </button>
+        
+        <button class="neo-btn btn-kibana" onclick="RunKibana()">
+            <div class="btn-icon">📊</div>
+            <div class="btn-text">Kibana Report</div>
+        </button>
+    </div>
+    
+    <button class="neo-btn btn-folder" onclick="OpenFolder()">
+        <div class="btn-icon">📁</div>
+        <div class="btn-text">Lihat Folder Generate</div>
+    </button>
+
+    <div class="footer">
+        oleh dandirayo
+    </div>
+</body>
+</html>
