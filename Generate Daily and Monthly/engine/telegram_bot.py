@@ -1,3 +1,6 @@
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 import os
 import json
 import time
@@ -124,5 +127,7 @@ print("="*60)
 print("Menunggu perintah dari Telegram...")
 try:
     bot.infinity_polling(timeout=10, long_polling_timeout=5)
+except KeyboardInterrupt:
+    print("\n[INFO] Server Telegram Bot dihentikan oleh pengguna.")
 except Exception as e:
     print(f"Error: {e}")

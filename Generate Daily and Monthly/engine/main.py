@@ -27,9 +27,9 @@ date_str, month_str, year_str, report_date_display = "", "", "", ""
 is_monthly_mode = False
 current_output_dir = ""
 
-def setup_dates(dt):
+def setup_dates(dt, is_dummy=False):
     global date_str, month_str, year_str, report_date_display, is_monthly_mode, current_output_dir, is_dummy_mode
-    is_dummy_mode = False
+    is_dummy_mode = is_dummy
     is_monthly_mode = False
     date_str = dt.strftime("%Y%m%d")
     month_str = dt.strftime("%B")
@@ -588,6 +588,92 @@ def process_transactions(path):
     df_err_count = pd.read_excel(path, sheet_name='Trx by Error Count', header=2)
     df_hourly = pd.read_excel(path, sheet_name='EFS Programs Hourly', header=2)
 
+    try:
+        df_status = pd.read_excel(path, sheet_name='EFS Status Code', header=2)
+        clean_cols(df_status, ['Error', 'Normal', 'Standby', 'Warning'])
+    except Exception:
+        df_status = pd.DataFrame()
+
+    try:
+        df_err_msg = pd.read_excel(path, sheet_name='Trx by Error Type Msg', header=2)
+        clean_cols(df_err_msg, ['Count'])
+    except Exception:
+        df_err_msg = pd.DataFrame()
+
+    # Mapping 11 Program Krusial EFS
+    core_programs_mapping = [
+        ("Create Accounting", ["Create Accounting"]),
+        ("Accounting Program", ["Accounting Program"]),
+        ("Journal Import", ["Journal Import"]),
+        ("Posting", ["Posting", "Posting: Single Ledger"]),
+        ("Transfer Journal to GL", ["Transfer Journal Entries to GL"]),
+        ("Interface Kurs Harian", ["BNI GL Interface Kurs Harian"]),
+        ("BNI FAH Journal Reversal", ["BNI FAH Journal Reversal"]),
+        ("BNI GL Jurnal Trx Entity V2", ["BNI GL Laporan Jurnal Transaksi per Entity V2"]),
+        ("BNI FAH Laporan Konfigurasi", ["BNI FAH Laporan Konfigurasi"])
+    ]
+
+    trx_core_programs = []
+    for label, exact_names in core_programs_mapping:
+        for name in exact_names:
+            s_row = df_summary[df_summary['Program Name'] == name] if 'Program Name' in df_summary.columns else pd.DataFrame()
+            if s_row.empty and not df_status.empty and 'Program Name' in df_status.columns:
+                st_match = df_status[df_status['Program Name'] == name]
+                if st_match.empty:
+                    continue
+
+            total_hit = s_row['Total Hit'].values[0] if not s_row.empty and 'Total Hit' in s_row.columns else 0
+            p95 = s_row['P95 (min)'].values[0] if not s_row.empty and 'P95 (min)' in s_row.columns else 0
+            p99 = s_row['P99 (min)'].values[0] if not s_row.empty and 'P99 (min)' in s_row.columns else 0
+            er = s_row['Error Rate (%)'].values[0] if not s_row.empty and 'Error Rate (%)' in s_row.columns else 0
+
+            normal = 0
+            warning = 0
+            error = 0
+            if not df_status.empty and 'Program Name' in df_status.columns:
+                st_row = df_status[df_status['Program Name'] == name]
+                if not st_row.empty:
+                    normal = st_row['Normal'].values[0] if 'Normal' in st_row.columns else 0
+                    warning = st_row['Warning'].values[0] if 'Warning' in st_row.columns else 0
+                    error = st_row['Error'].values[0] if 'Error' in st_row.columns else 0
+
+            if total_hit == 0 and (normal + warning + error) > 0:
+                total_hit = normal + warning + error
+
+            err_msgs = []
+            if not df_err_msg.empty and 'Program Name' in df_err_msg.columns:
+                err_sub = df_err_msg[df_err_msg['Program Name'] == name]
+                for _, erow in err_sub.iterrows():
+                    m = str(erow.get('Message', '')).strip()
+                    c = safe_int(erow.get('Count', 0))
+                    if 'completed normal' not in m.lower():
+                        err_msgs.append(f"[{c}x] {m}")
+            err_str = " | ".join(err_msgs) if err_msgs else "-"
+
+            status_badge = "HEALTHY"
+            status_cls = "healthy"
+            if error > 0:
+                status_badge = "CRITICAL"
+                status_cls = "critical"
+            elif warning > 0 or er > 0:
+                status_badge = "WARNING"
+                status_cls = "warning"
+
+            trx_core_programs.append({
+                'category': label,
+                'program': name,
+                'total_hit': f"{safe_int(total_hit):,}",
+                'normal': f"{safe_int(normal):,}",
+                'warning': safe_int(warning),
+                'error': safe_int(error),
+                'p95': safe_float_str(p95),
+                'p99': safe_float_str(p99),
+                'status': status_badge,
+                'status_class': status_cls,
+                'error_detail': err_str
+            })
+
+
     clean_cols(df_summary, ['Total Hit', 'Success Rate (%)', 'Error Rate (%)'])
     clean_cols(df_top_vol, ['Total Hits'])
     clean_cols(df_top_slow, ['P95 (min)'])
@@ -643,27 +729,34 @@ def process_transactions(path):
     # 2. Top 10 Fastest
     trx_fastest_rows = []
     if 'Program Name' in df_top_fast.columns and 'P95 (min)' in df_top_fast.columns:
-        for _, row in df_top_fast.head(10).iterrows():
-            prog_name = str(row.get('Program Name', ''))
-            # Format nama yang terlalu panjang agar muat di kolom sempit
+        for _, row in df_top_fast.iterrows():
+            prog_name = str(row.get('Program Name', '')).strip()
+            if not prog_name or prog_name.lower() == 'nan':
+                continue
             if len(prog_name) > 40:
                 prog_name = prog_name[:37] + '...'
             trx_fastest_rows.append({
                 'program': prog_name,
                 'p95': safe_float_str(row.get('P95 (min)', 0))
             })
+            if len(trx_fastest_rows) >= 10:
+                break
             
     # 3. Top 10 Slowest
     trx_slowest_rows = []
     if 'Program Name' in df_top_slow.columns and 'P95 (min)' in df_top_slow.columns:
-        for _, row in df_top_slow.head(10).iterrows():
-            prog_name = str(row.get('Program Name', ''))
+        for _, row in df_top_slow.iterrows():
+            prog_name = str(row.get('Program Name', '')).strip()
+            if not prog_name or prog_name.lower() == 'nan':
+                continue
             if len(prog_name) > 40:
                 prog_name = prog_name[:37] + '...'
             trx_slowest_rows.append({
                 'program': prog_name,
                 'p95': safe_float_str(row.get('P95 (min)', 0))
             })
+            if len(trx_slowest_rows) >= 10:
+                break
 
     # Error Types
     error_type_rows = []
@@ -704,6 +797,7 @@ def process_transactions(path):
         'trx_error_type_rows': error_type_rows,
         'trx_err_prog_rows': err_prog_rows,
         'trx_concurrent_hourly': concurrent_hourly,
+        'trx_core_programs': trx_core_programs,
     }
 
 
@@ -1198,22 +1292,49 @@ def export_markdown(all_data):
     lines.append(f"> **Temuan Utama:** Residual XLA tercatat sebanyak {all_data.get('xla_unprocessed', '0')} records. GL Posted mencapai {all_data.get('gl_total_posted', '0')} ({all_data.get('gl_posted_rate', '0')}% intake).\n")
     lines.append("---\n")
 
-    # 02. Reliability Framework & SLO
-    lines.append("## 02. Reliability Framework & Service Level Objective (SLO)")
-    lines.append("| Sinyal | Metrik | Target | Aktual | Verdict |")
+        # 02. Reliability Framework
+    lines.append("## 02. Glosari dan Service Level Objective (SLO)")
+    lines.append("### Service Level Objective (SLO)")
+    lines.append("| Sinyal / Domain | Metrik | Target | Realisasi | Verdict |")
     lines.append("|---|---|---|---|---|")
-    lines.append(f"| Errors | XLA code success | >=99.5% | {all_data.get('xla_success_pct', '0')}% | WARNING |")
-    lines.append(f"| Latency | Program P99 | Dalam baseline | 213,31 min | GAGAL |")
-    lines.append(f"| Saturation | CPU Max | <80% | 98,30% | GAGAL |")
-    lines.append(f"| GL | Posted / Intake | >=99.5% | {all_data.get('gl_posted_rate', '0')}% | WARNING |\n")
+    lines.append(f"| Errors (Kualitas) | XLA Code Success Rate | >= 99.5% | {all_data.get('xla_success_pct', '0')}% | {'PASS' if safe_float(all_data.get('xla_success_pct', 0)) >= 99.5 else 'WARNING'} |")
+    lines.append(f"| Latency (Kecepatan) | Batch Program P99 Latency | Dalam baseline harian | Evaluasi P99 | {'CHECK' if all_data.get('overall_status') == 'CRITICAL' else 'PASS'} |")
+    lines.append(f"| Saturation (Beban) | CPU Server Max | < 80% | Infrastructure Overview | {'PASS' if all_data.get('infra_critical_count', 0) == 0 else 'CRITICAL'} |")
+    lines.append(f"| GL Funnel (Integritas) | GL Posted / Total Intake | >= 99.5% | {all_data.get('gl_posted_rate', '0')}% | {'PASS' if safe_float(all_data.get('gl_posted_rate', 0)) >= 99.5 else 'WARNING'} |\n")
+    lines.append("### Alur Pemrosesan Akuntansi End-to-End (Data Pipeline)")
+    lines.append("1. **Source Apps:** Aplikasi hulu (ICONS, Credit Card, Cross Border, Joint Finance) mentransfer file transaksi harian.")
+    lines.append("2. **FAH & XLA Intake:** Validasi kelayakan format file sumber dan pendaftaran event transaksi di Subledger.")
+    lines.append("3. **Create Accounting:** Penerjemahan event transaksi menjadi entri jurnal debit/kredit standar (Accounting Program).")
+    lines.append("4. **Transfer to GL:** Pengiriman jurnal accounted ke antarmuka buku besar (Journal Import).")
+    lines.append("5. **GL Posting:** Pembukuan resmi jurnal ke saldo buku besar (GL_BALANCES).\n")
+    lines.append("### Glosari Istilah Kunci")
+    lines.append("- **XLA (Subledger Accounting):** Modul akuntansi sentral Oracle yang memetakan transaksi bisnis hulu menjadi jurnal standar.")
+    lines.append("- **FAH (Financial Accounting Hub):** Gerbang penerima data aplikasi eksternal untuk memvalidasi format data sebelum diproses akuntansi.")
+    lines.append("- **Accounted vs Not Accounted:** *Accounted* = jurnal DR/CR berhasil terbentuk; *Not Accounted* = data valid namun jurnal belum terbentuk (menunggu sweep/rule).")
+    lines.append("- **XLA Error vs Event Unprocessed:** *XLA Error* = transaksi gagal akuntansi (kurs closing belum ada/selisih intercompany); *Unprocessed* = antrean antrean harian wajar.")
+    lines.append("- **Posted vs Unposted GL:** *Posted* = resmi mengupdate saldo neraca; *Unposted* = jurnal sudah masuk ke GL tapi belum diposting (tertunda).")
+    lines.append("- **P95 / P99 Latency:** 95% atau 99% request selesai di bawah durasi tersebut. P99 adalah tolok ukur utama durasi terburuk (*worst-case*).")
+    lines.append("- **CPU Saturation:** Utilisasi prosesor server >80% (Warning) atau >90% (Critical) yang berpotensi memperlambat antrean Concurrent Manager.\n")
     lines.append("---\n")
 
     # 03. Concurrent Job
     lines.append("## 03. Concurrent Job dan Latency Program")
-    lines.append("| Program | Hits | Avg (min) | P95 (min) | P99 (min) | Success % | Status |")
-    lines.append("|---|---|---|---|---|---|---|")
-    for r in all_data.get('trx_top_slow_rows', []):
-        lines.append(f"| {r.get('program')} | {r.get('hits')} | {r.get('avg')} | {r.get('p95')} | {r.get('p99')} | {r.get('success')} | {r.get('status')} |")
+    lines.append("### Monitoring Program Utama EFS (Accounting & GL)")
+    lines.append("| Program Name | Total Hit | Normal | Warning | Error | P95 (min) | P99 (min) | Status | Detail Pesan (Warning / Error) |")
+    lines.append("|---|---|---|---|---|---|---|---|---|")
+    for r in all_data.get('trx_core_programs', []):
+        err_d = r.get('error_detail', '-').replace('\n', ' ')
+        if err_d != '-':
+            if r.get('error', 0) > 0:
+                err_d = f"[Error] {err_d}"
+            else:
+                err_d = f"[Warning] {err_d}"
+        lines.append(f"| {r.get('program')} | {r.get('total_hit')} | {r.get('normal')} | {r.get('warning')} | {r.get('error')} | {r.get('p95')} | {r.get('p99')} | {r.get('status')} | {err_d} |")
+    lines.append("\n### Monitoring Program KLN (Kliring)")
+    lines.append("| Program Name | Total Hit | P99 (min) | Status |")
+    lines.append("|---|---|---|---|")
+    for r in all_data.get('trx_kln_rows', []):
+        lines.append(f"| {r.get('program')} | {r.get('hits')} | {r.get('p99')} | {r.get('status')} |")
     lines.append("\n---\n")
 
     # 04. XLA Status
@@ -1229,17 +1350,17 @@ def export_markdown(all_data):
     lines.append("---\n")
 
     # 05. GL Posting Funnel
-    lines.append("## 05. General Ledger Posting Funnel")
-    lines.append(f"- **Masuk FAH:** {all_data.get('gl_total_masuk')}")
-    lines.append(f"- **FAH Success:** {all_data.get('gl_total_success')}")
-    lines.append(f"- **FAH Error:** {all_data.get('gl_total_error')}")
-    lines.append(f"- **Not Accounted:** {all_data.get('gl_total_accounted')}")
-    lines.append(f"- **Posted GL:** {all_data.get('gl_total_posted')} ({all_data.get('gl_posted_rate')}% intake)\n")
+    lines.append("## 05. Monitoring Alur Akuntansi End-to-End (FAH Intake s/d GL Posting)")
+    lines.append(f"- **1. FAH Interface / Intake (Masuk FAH):** {all_data.get('gl_total_masuk')}")
+    lines.append(f"- **2. FAH Processing (FAH Success / Error):** {all_data.get('gl_total_success')} / {all_data.get('gl_total_error')}")
+    lines.append(f"- **3. SLA Accounting (Accounted / Not Accounted):** {all_data.get('gl_total_accounted')} / {all_data.get('gl_total_not_accounted')}")
+    lines.append(f"- **4. Transfer to GL (Transferred):** {all_data.get('gl_total_transferred')}")
+    lines.append(f"- **5. GL Posting (Posted / Unposted):** {all_data.get('gl_total_posted')} ({all_data.get('gl_posted_rate')}% intake) / {all_data.get('gl_total_unposted')}\n")
     lines.append("### Detail Per Application:")
-    lines.append("| Application | Masuk FAH | FAH Error | Not Accounted | Posted | Unposted |")
+    lines.append("| Application | 1. Masuk FAH (Intake) | 2. FAH Error (Pre-process) | 3. Not Accounted (SLA) | 4. Posted (GL) | 5. Unposted (GL) |")
     lines.append("|---|---|---|---|---|---|")
     for r in all_data.get('gl_app_rows', []):
-        lines.append(f"| {r.get('name')} | {r.get('masuk_fah')} | {r.get('fah_error')} | {r.get('accounted')} | {r.get('posted')} | {r.get('unposted')} |")
+        lines.append(f"| {r.get('name')} | {r.get('masuk_fah')} | {r.get('fah_error')} | {r.get('not_accounted')} | {r.get('posted')} | {r.get('unposted')} |")
     lines.append("\n---\n")
 
     # 06. Detailed Breakdown
@@ -1248,7 +1369,15 @@ def export_markdown(all_data):
     lines.append("|---|---|---|---|---|---|---|")
     for r in all_data.get('xla_entity_rows', []):
         lines.append(f"| {r.get('code')} | {r.get('total')} | {r.get('processed')} | {r.get('unprocessed')} | {r.get('unproc_pct')} | {r.get('amount')} | {r.get('status')} |")
-    lines.append("\n---\n")
+    lines.append("\n### Glosarium Alur Akuntansi End-to-End (Data Pipeline EFS)")
+    lines.append("- **1. FAH Interface / Intake:** Masuk FAH (staging transaksi sumber).")
+    lines.append("- **2. FAH Processing:** Validasi struktur file (FAH Success vs FAH Error).")
+    lines.append("- **3. XLA Event Processing:** Registrasi event akuntansi (Entities Invalid / Stuck in XLA).")
+    lines.append("- **4. SLA Accounting:** Create Accounting untuk membentuk jurnal debit-kredit (Accounted vs Not Accounted).")
+    lines.append("- **5. Transfer to GL:** Pemindahan batch jurnal accounted ke GL Interface.")
+    lines.append("- **6. GL Journal Import:** Pembentukan entri jurnal di General Ledger.")
+    lines.append("- **7. GL Posting:** Pembukuan final saldo jurnal ke buku besar (Posted vs Unposted).\n")
+    lines.append("---\n")
 
     # 07. Financial Footprint
     lines.append("## 07. Financial Footprint (Distribusi Currency)")
@@ -1359,8 +1488,8 @@ class Spinner:
         sys.stdout.write(f"\r\033[92m[✓]\033[0m {self.message}" + " " * 10 + "\n")
         sys.stdout.flush()
 
-def run_report_for_date(target_dt, generate_email=False):
-    setup_dates(target_dt)
+def run_report_for_date(target_dt, generate_email=False, is_dummy=False):
+    setup_dates(target_dt, is_dummy=is_dummy)
     print("\n" + "=" * 80)
     print(f"  \033[1mMEMULAI PROSES REPORT: {report_date_display}\033[0m")
     print("=" * 80 + "\n")
@@ -1624,7 +1753,8 @@ if __name__ == "__main__":
         print("  │                                                                          │")
         print("  └──────────────────────────────────────────────────────────────────────────┘")
         
-        pilihan = input("  Pilihan [1-16]: ").strip()
+        pilihan_raw = input("  Pilihan [1-16]: ").strip()
+        pilihan = pilihan_raw.lower()
         
         if pilihan == "15":
             print("\n  \033[92m👋 Sampai jumpa!\033[0m\n")
@@ -1662,21 +1792,32 @@ if __name__ == "__main__":
             os.system('cls' if os.name == 'nt' else 'clear')
             continue
 
-        valid_choices = ["1", "1a", "1A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "16", ""]
+        valid_choices = ["1", "1a", "1b", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "16", ""]
         if pilihan not in valid_choices:
-            print("  [91mPilihan tidak valid![0m")
-            import time
+            print("  \033[91m❌ Pilihan tidak valid!\033[0m")
             time.sleep(1)
-            import os
             os.system('cls' if os.name == 'nt' else 'clear')
             continue
             
         if pilihan != "":
             konfirmasi = input("\n  Eksekusi pilihan ini? (Y/N): ").strip().lower()
             if konfirmasi != 'y':
-                import os
                 os.system('cls' if os.name == 'nt' else 'clear')
                 continue
+
+        # Khusus 1B: Langsung jalankan Server Telegram Bot
+        if pilihan == "1b":
+            print("\n  \033[96m🤖 Memulai Server Telegram Bot...\033[0m")
+            print("  \033[90m(Tekan Ctrl+C di terminal untuk menghentikan bot dan kembali ke menu)\033[0m\n")
+            import subprocess
+            bot_path = os.path.join(ENGINE_DIR, "telegram_bot.py")
+            try:
+                subprocess.run([sys.executable, bot_path])
+            except KeyboardInterrupt:
+                print("\n  \033[93mServer Telegram Bot dihentikan.\033[0m")
+            input("\n  Tekan ENTER untuk kembali ke menu utama...")
+            os.system('cls' if os.name == 'nt' else 'clear')
+            continue
 
         # Tanya AI untuk batch/manual
         if pilihan in ["2", "3", "4", "5", "6", "7", "11"]:
@@ -1690,6 +1831,7 @@ if __name__ == "__main__":
         is_download_only = False
         is_monthly = False
         generate_email = False
+        is_dummy = False
         monthly_jobs = [] # list of tuples (month_en, year_str)
         
         ID_TO_EN_MONTH = {
@@ -1711,12 +1853,13 @@ if __name__ == "__main__":
                 generate_email = True
             if 'SKIP_AI' in os.environ:
                 del os.environ['SKIP_AI']
-        elif pilihan == "1b":
-            print("\n  \033[96mMemulai Server Telegram Bot...\033[0m")
-            import subprocess
-            bot_path = os.path.join(ENGINE_DIR, "telegram_bot.py")
-            subprocess.run([sys.executable, bot_path])
-            continue
+        elif pilihan == "16":
+            is_dummy = True
+            dates_to_run.append(default_date)
+            ui_email = input("  Generate draf email summary (Y/N)? ").strip().lower()
+            if ui_email == 'y':
+                generate_email = True
+            os.environ['SKIP_AI'] = '1'
         elif pilihan == "2":
             ui_date = input("  Ketik tanggal (YYYYMMDD): ").strip()
             try:
@@ -1726,18 +1869,22 @@ if __name__ == "__main__":
                 time.sleep(2)
                 continue
         elif pilihan == "3":
+            now_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
             for i in range(3, 0, -1):
-                dates_to_run.append(datetime.now() - timedelta(days=i))
+                dates_to_run.append(now_dt - timedelta(days=i))
         elif pilihan == "4":
+            now_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
             for i in range(7, 0, -1):
-                dates_to_run.append(datetime.now() - timedelta(days=i))
+                dates_to_run.append(now_dt - timedelta(days=i))
         elif pilihan == "5":
-            now = datetime.now()
-            start_of_month = now.replace(day=1)
-            end_date = now - timedelta(days=1)
+            now_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now_dt - timedelta(days=1)
+            # Jika hari ini tanggal 1, H-1 adalah akhir bulan lalu, sehingga ambil seluruh bulan lalu
+            start_of_month = end_date.replace(day=1)
             delta = end_date - start_of_month
             for i in range(delta.days + 1):
                 dates_to_run.append(start_of_month + timedelta(days=i))
+            print(f"\n  \033[96m📅 Menjalankan batch dari {start_of_month.strftime('%Y-%m-%d')} s/d {end_date.strftime('%Y-%m-%d')} ({len(dates_to_run)} hari)\033[0m")
         elif pilihan == "6":
             start_str = input("  Tanggal Awal (YYYYMMDD): ").strip()
             end_str = input("  Tanggal Akhir (YYYYMMDD): ").strip()
@@ -1783,8 +1930,9 @@ if __name__ == "__main__":
             dates_to_run.append(default_date)
         elif pilihan == "9":
             is_download_only = True
+            now_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
             for i in range(3, 0, -1):
-                dates_to_run.append(datetime.now() - timedelta(days=i))
+                dates_to_run.append(now_dt - timedelta(days=i))
         elif pilihan in ["11", "12"]:
             is_monthly = True
             is_download_only = (pilihan == "12")
@@ -1807,7 +1955,7 @@ if __name__ == "__main__":
 
         if not dates_to_run and not monthly_jobs:
             continue
-
+            
         # Jalankan loop batch
         success_count = 0
         fail_count = 0
@@ -1827,7 +1975,7 @@ if __name__ == "__main__":
                 if is_download_only:
                     res = run_download_only(dt)
                 else:
-                    res = run_report_for_date(dt, generate_email=generate_email)
+                    res = run_report_for_date(dt, generate_email=generate_email, is_dummy=is_dummy)
                     
                 if res:
                     success_count += 1

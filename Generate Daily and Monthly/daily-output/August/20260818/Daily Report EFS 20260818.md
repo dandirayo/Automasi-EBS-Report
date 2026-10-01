@@ -18,19 +18,51 @@
 
 ---
 
-## 02. Reliability Framework & Service Level Objective (SLO)
-| Sinyal | Metrik | Target | Aktual | Verdict |
+## 02. Glosari dan Service Level Objective (SLO)
+### Service Level Objective (SLO)
+| Sinyal / Domain | Metrik | Target | Realisasi | Verdict |
 |---|---|---|---|---|
-| Errors | XLA code success | >=99.5% | 48.51% | WARNING |
-| Latency | Program P99 | Dalam baseline | 213,31 min | GAGAL |
-| Saturation | CPU Max | <80% | 98,30% | GAGAL |
-| GL | Posted / Intake | >=99.5% | 94.43% | WARNING |
+| Errors (Kualitas) | XLA Code Success Rate | >= 99.5% | 48.51% | WARNING |
+| Latency (Kecepatan) | Batch Program P99 Latency | Dalam baseline harian | Evaluasi P99 | CHECK |
+| Saturation (Beban) | CPU Server Max | < 80% | Infrastructure Overview | CRITICAL |
+| GL Funnel (Integritas) | GL Posted / Total Intake | >= 99.5% | 94.43% | WARNING |
+
+### Alur Pemrosesan Akuntansi End-to-End (Data Pipeline)
+1. **Source Apps:** Aplikasi hulu (ICONS, Credit Card, Cross Border, Joint Finance) mentransfer file transaksi harian.
+2. **FAH & XLA Intake:** Validasi kelayakan format file sumber dan pendaftaran event transaksi di Subledger.
+3. **Create Accounting:** Penerjemahan event transaksi menjadi entri jurnal debit/kredit standar (Accounting Program).
+4. **Transfer to GL:** Pengiriman jurnal accounted ke antarmuka buku besar (Journal Import).
+5. **GL Posting:** Pembukuan resmi jurnal ke saldo buku besar (GL_BALANCES).
+
+### Glosari Istilah Kunci
+- **XLA (Subledger Accounting):** Modul akuntansi sentral Oracle yang memetakan transaksi bisnis hulu menjadi jurnal standar.
+- **FAH (Financial Accounting Hub):** Gerbang penerima data aplikasi eksternal untuk memvalidasi format data sebelum diproses akuntansi.
+- **Accounted vs Not Accounted:** *Accounted* = jurnal DR/CR berhasil terbentuk; *Not Accounted* = data valid namun jurnal belum terbentuk (menunggu sweep/rule).
+- **XLA Error vs Event Unprocessed:** *XLA Error* = transaksi gagal akuntansi (kurs closing belum ada/selisih intercompany); *Unprocessed* = antrean antrean harian wajar.
+- **Posted vs Unposted GL:** *Posted* = resmi mengupdate saldo neraca; *Unposted* = jurnal sudah masuk ke GL tapi belum diposting (tertunda).
+- **P95 / P99 Latency:** 95% atau 99% request selesai di bawah durasi tersebut. P99 adalah tolok ukur utama durasi terburuk (*worst-case*).
+- **CPU Saturation:** Utilisasi prosesor server >80% (Warning) atau >90% (Critical) yang berpotensi memperlambat antrean Concurrent Manager.
 
 ---
 
 ## 03. Concurrent Job dan Latency Program
-| Program | Hits | Avg (min) | P95 (min) | P99 (min) | Success % | Status |
-|---|---|---|---|---|---|---|
+### Monitoring Program Utama EFS (Accounting & GL)
+| Program Name | Total Hit | Normal | Warning | Error | P95 (min) | P99 (min) | Status | Detail Pesan (Warning / Error) |
+|---|---|---|---|---|---|---|---|---|
+| Create Accounting | 1,924 | 867 | 424 | 1 | 142.13 | 234.34 | CRITICAL | - |
+| Accounting Program | 140 | 76 | 64 | 0 | 52.90 | 282.66 | WARNING | [Warning] [64x] (no completion text) |
+| Journal Import | 1,050 | 1,050 | 0 | 0 | 0.57 | 1.93 | HEALTHY | - |
+| Posting | 2 | 2 | 0 | 0 | 0.17 | 0.17 | HEALTHY | - |
+| Posting: Single Ledger | 1,051 | 1,051 | 0 | 0 | 0.55 | 0.61 | HEALTHY | - |
+| Transfer Journal Entries to GL | 7 | 5 | 2 | 0 | 107.77 | 117.13 | WARNING | - |
+| BNI GL Interface Kurs Harian | 1 | 1 | 0 | 0 | 61.38 | 61.38 | HEALTHY | - |
+| BNI FAH Journal Reversal | 2 | 2 | 0 | 0 | 19.47 | 19.47 | HEALTHY | - |
+| BNI GL Laporan Jurnal Transaksi per Entity V2 | 30 | 30 | 0 | 0 | 25.98 | 30.62 | HEALTHY | - |
+
+### Monitoring Program KLN (Kliring)
+| Program Name | Total Hit | P99 (min) | Status |
+|---|---|---|---|
+| BNI GL Interface Jurnal KLN | 1 | 0.02 | Healthy |
 
 ---
 
@@ -45,24 +77,24 @@
 
 ---
 
-## 05. General Ledger Posting Funnel
-- **Masuk FAH:** 227,713
-- **FAH Success:** 215,140
-- **FAH Error:** 505
-- **Not Accounted:** 215,022
-- **Posted GL:** 215,022 (94.43% intake)
+## 05. Monitoring Alur Akuntansi End-to-End (FAH Intake s/d GL Posting)
+- **1. FAH Interface / Intake (Masuk FAH):** 227,713
+- **2. FAH Processing (FAH Success / Error):** 215,140 / 505
+- **3. SLA Accounting (Accounted / Not Accounted):** 215,022 / 118
+- **4. Transfer to GL (Transferred):** 215,022
+- **5. GL Posting (Posted / Unposted):** 215,022 (94.43% intake) / 0
 
 ### Detail Per Application:
-| Application | Masuk FAH | FAH Error | Not Accounted | Posted | Unposted |
+| Application | 1. Masuk FAH (Intake) | 2. FAH Error (Pre-process) | 3. Not Accounted (SLA) | 4. Posted (GL) | 5. Unposted (GL) |
 |---|---|---|---|---|---|
-| ICONS Custom Application | 227,350 | 505 | 214,673 | 214,673 | 0 |
-| CROSS BORDER PAYMENT Custom Application | 218 | 0 | 218 | 218 | 0 |
-| PSAK 71 Custom Application | 76 | 0 | 76 | 76 | 0 |
-| CREDIT CARD Custom Application | 42 | 0 | 30 | 30 | 0 |
-| TREASURY Custom Application | 10 | 0 | 10 | 10 | 0 |
-| PREPAID SYSTEM Custom Application | 9 | 0 | 7 | 7 | 0 |
-| JOINT FINANCE Custom Application | 6 | 0 | 6 | 6 | 0 |
-| SUPPLY CHAIN FINANCING Custom Application | 2 | 0 | 2 | 2 | 0 |
+| ICONS Custom Application | 227,350 | 505 | 104 | 214,673 | 0 |
+| CROSS BORDER PAYMENT Custom Application | 218 | 0 | 0 | 218 | 0 |
+| PSAK 71 Custom Application | 76 | 0 | 0 | 76 | 0 |
+| CREDIT CARD Custom Application | 42 | 0 | 12 | 30 | 0 |
+| TREASURY Custom Application | 10 | 0 | 0 | 10 | 0 |
+| PREPAID SYSTEM Custom Application | 9 | 0 | 2 | 7 | 0 |
+| JOINT FINANCE Custom Application | 6 | 0 | 0 | 6 | 0 |
+| SUPPLY CHAIN FINANCING Custom Application | 2 | 0 | 0 | 2 | 0 |
 
 ---
 
@@ -79,6 +111,15 @@
 | BRA-NQ_ED2P_T_GLDV | 8,743 | 8,743 | 0 | 0.00% | 72,803,110,846,561.98 | Healthy |
 | LON-Q_GLCP_LOND2140 | 5,887 | 5,887 | 0 | 0.00% | -36,378,551,385,159.40 | Healthy |
 | DEP-NQ_ED2P_CC_INVV | 5,262 | 1,386 | 0 | 0.00% | 4,335,257,613,376.91 | Healthy |
+
+### Glosarium Alur Akuntansi End-to-End (Data Pipeline EFS)
+- **1. FAH Interface / Intake:** Masuk FAH (staging transaksi sumber).
+- **2. FAH Processing:** Validasi struktur file (FAH Success vs FAH Error).
+- **3. XLA Event Processing:** Registrasi event akuntansi (Entities Invalid / Stuck in XLA).
+- **4. SLA Accounting:** Create Accounting untuk membentuk jurnal debit-kredit (Accounted vs Not Accounted).
+- **5. Transfer to GL:** Pemindahan batch jurnal accounted ke GL Interface.
+- **6. GL Journal Import:** Pembentukan entri jurnal di General Ledger.
+- **7. GL Posting:** Pembukuan final saldo jurnal ke buku besar (Posted vs Unposted).
 
 ---
 

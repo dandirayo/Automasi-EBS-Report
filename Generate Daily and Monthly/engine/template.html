@@ -95,34 +95,145 @@
 </div>
 {% endif %}
 
-<div class="callout {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}"><strong>Perhatian:</strong> Pengecekan mendalam disarankan pada indikator berwarna merah atau oranye. Lihat detil metrik pada seksi selanjutnya.</div></section><section class="section" id="slo"><div class="section-head"><div><div class="section-kicker">Reliability Framework</div><h2>Glosari dan Service Level Objective</h2></div><div class="section-no">02</div></div><div class="table-wrap"><table><thead><tr><th>Sinyal</th><th>Metrik</th><th>Target</th><th>Aktual</th><th>Verdict</th></tr></thead><tbody><tr><td>Errors</td><td>XLA code success</td><td>&gt;=99,5%</td><td>{{ xla_success_pct }}%</td><td><span class="badge {{ 'warning' if xla_success_pct < '99.5' else 'healthy' }}">CHECK</span></td></tr><tr><td>Latency</td><td>Program P99</td><td>Dalam baseline</td><td>P99 Overview</td><td><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">CHECK</span></td></tr><tr><td>Saturation</td><td>CPU Max</td><td>&lt;80%</td><td>Infrastructure Overview</td><td><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">CHECK</span></td></tr><tr><td>GL</td><td>Posted / Intake</td><td>&gt;=99,5%</td><td>{{ gl_posted_rate }}%</td><td><span class="badge {{ 'warning' if gl_posted_rate < '99.5' else 'healthy' }}">CHECK</span></td></tr></tbody></table></div>
-</section><section class="section" id="transactions"><div class="section-head"><div><div class="section-kicker">Program Transactions</div><h2>Concurrent Job dan Latency Program</h2></div><div class="section-no">03</div></div><p class="section-intro">Highlight difokuskan pada proses accounting, reporting, dan kliring. Total Hits {% if is_monthly %}bulanan{% else %}harian{% endif %}: {{ trx_total_hits }} records. Top Slowest & Fastest diurutkan berdasarkan metrik persentil 95.</p>
+<div class="callout {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}"><strong>Perhatian:</strong> Pengecekan mendalam disarankan pada indikator berwarna merah atau oranye. Lihat detil metrik pada seksi selanjutnya.</div></section><section class="section" id="slo">
+<div class="section-head">
+    <div><div class="section-kicker">Reliability &amp; Accounting Framework</div><h2>Glosari dan Service Level Objective</h2></div>
+    <div class="section-no">02</div>
+</div>
+<p class="section-intro">Panduan komprehensif bagi Tim Akuntansi dan Developer/IT dalam membaca metrik operasional, batas toleransi (SLO), serta alur pemrosesan data end-to-end dari aplikasi sumber hingga buku besar (GL).</p>
 
-<h3 style="font-size: 12px; color: var(--navy); margin: 10px 0 6px; font-weight: 800;">🔄 Monitoring Program KLN (Kliring)</h3>
-<div class="table-wrap" style="margin-bottom: 16px;"><table class="wide"><thead><tr style="background:#f1f5f9;"><th style="padding:6px; color:#334155;">Program Name</th><th class="right" style="padding:6px; color:#334155;">Total Hit</th><th class="right" style="padding:6px; color:#334155;">P99 (mnt)</th><th style="padding:6px; width:70px; color:#334155;">Status</th></tr></thead><tbody>
+<!-- 1. SLO Table -->
+<h3 style="font-size:11px; color:var(--navy); margin:10px 0 6px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">🎯 Service Level Objective (SLO) &amp; Operational Threshold</h3>
+<div class="table-wrap" style="margin-bottom:14px;">
+    <table class="wide" style="font-size:9.5px;">
+        <thead>
+            <tr style="background:#f1f5f9;">
+                <th style="padding:5px 8px; color:#334155;">Sinyal / Domain</th>
+                <th style="padding:5px 8px; color:#334155;">Metrik yang Dimonitor</th>
+                <th style="padding:5px 8px; color:#334155;">Target Operasional</th>
+                <th style="padding:5px 8px; color:#334155;">Realisasi Hari Ini</th>
+                <th style="padding:5px 8px; width:75px; text-align:center; color:#334155;">Verdict</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">Errors (Kualitas)</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">XLA Code Success Rate</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">&gt;= 99.5%</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">{{ xla_success_pct }}%</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ 'warning' if xla_success_pct < '99.5' else 'healthy' }}">CHECK</span></td>
+            </tr>
+            <tr>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">Latency (Kecepatan)</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Batch Program P99 Latency</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Dalam batas baseline harian</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Sesuai evaluasi P99</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">CHECK</span></td>
+            </tr>
+            <tr>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">Saturation (Beban)</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Utilisasi CPU Server Maksimum</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">&lt; 80% (Warning: 80%, Crit: 90%)</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Infrastruktur Overview</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">CHECK</span></td>
+            </tr>
+            <tr>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">GL Funnel (Integritas)</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">Rasio GL Posted / Total Intake</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">&gt;= 99.5%</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; font-weight:600;">{{ gl_posted_rate }}%</td>
+                <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ 'warning' if gl_posted_rate < '99.5' else 'healthy' }}">CHECK</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2. End-to-End Pipeline Guide -->
+<h3 style="font-size:11px; color:var(--navy); margin:12px 0 6px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">🔄 Alur Pemrosesan Akuntansi End-to-End (Data Pipeline)</h3>
+<div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-bottom:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+    <div style="background:#ffffff; border-left:3px solid var(--blue); padding:6px 8px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <div style="font-size:10px; font-weight:800; color:var(--blue); margin-bottom:2px;">1. SOURCE APPS</div>
+        <div style="font-size:8.5px; color:#475569; line-height:1.25;">Aplikasi hulu (ICONS, CC, CB, JF) mentransfer file transaksi harian.</div>
+    </div>
+    <div style="background:#ffffff; border-left:3px solid #0284c7; padding:6px 8px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <div style="font-size:10px; font-weight:800; color:#0284c7; margin-bottom:2px;">2. FAH &amp; XLA INTAKE</div>
+        <div style="font-size:8.5px; color:#475569; line-height:1.25;">Validasi struktur file &amp; pendaftaran event transaksi di Subledger.</div>
+    </div>
+    <div style="background:#ffffff; border-left:3px solid #d97706; padding:6px 8px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <div style="font-size:10px; font-weight:800; color:#d97706; margin-bottom:2px;">3. CREATE ACCOUNTING</div>
+        <div style="font-size:8.5px; color:#475569; line-height:1.25;">Penerjemahan event menjadi entri jurnal debit/kredit (Accounting Program).</div>
+    </div>
+    <div style="background:#ffffff; border-left:3px solid #6366f1; padding:6px 8px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <div style="font-size:10px; font-weight:800; color:#6366f1; margin-bottom:2px;">4. TRANSFER TO GL</div>
+        <div style="font-size:8.5px; color:#475569; line-height:1.25;">Pengiriman jurnal yang accounted ke antarmuka GL (Journal Import).</div>
+    </div>
+    <div style="background:#ffffff; border-left:3px solid var(--green); padding:6px 8px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <div style="font-size:10px; font-weight:800; color:var(--green); margin-bottom:2px;">5. GL POSTING</div>
+        <div style="font-size:8.5px; color:#475569; line-height:1.25;">Pembukuan resmi jurnal ke saldo buku besar (GL_BALANCES).</div>
+    </div>
+</div>
+
+<!-- 3. Dual-Perspective Glossary -->
+<h3 style="font-size:11px; color:var(--navy); margin:12px 0 6px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">📖 Glosari Istilah Kunci (Perspektif Akuntansi &amp; IT / Developer)</h3>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <!-- Kolom 1: Divisi Akuntansi -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-top:3px solid #0f766e; border-radius:6px; padding:10px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <h4 style="font-size:10.5px; color:#0f766e; margin:0 0 6px; font-weight:800; display:flex; align-items:center; gap:5px;">🏛️ Glosari Divisi Akuntansi (Accounting Concepts)</h4>
+        <ul style="margin:0; padding-left:14px; font-size:8.8px; color:#334155; line-height:1.4;">
+            <li style="margin-bottom:5px;"><strong>XLA (Subledger Accounting):</strong> Mesin akuntansi sentral Oracle yang memetakan transaksi bisnis hulu menjadi jurnal standar sebelum masuk ke General Ledger.</li>
+            <li style="margin-bottom:5px;"><strong>FAH (Financial Accounting Hub):</strong> Gerbang penerima data dari berbagai aplikasi eksternal (ICONS, Credit Card, dll) untuk validasi format sebelum diproses akuntansi.</li>
+            <li style="margin-bottom:5px;"><strong>Accounted vs Not Accounted:</strong> <em>Accounted</em> adalah transaksi yang sukses dibuatkan jurnal debit-kreditnya. <em>Not Accounted</em> adalah data yang lolos validasi tetapi jurnalnya belum terbentuk (menunggu sweep atau aturan jurnal spesifik belum terdefinisi).</li>
+            <li style="margin-bottom:5px;"><strong>XLA Error vs Event Unprocessed:</strong> <em>XLA Error</em> adalah transaksi gagal diproses (misal: Kurs Closing valas belum ada / intercompany selisih). <em>Unprocessed</em> adalah antrean transaksi wajar yang sedang menunggu giliran batch.</li>
+            <li><strong>Posted vs Unposted GL:</strong> <em>Posted</em> berarti jurnal telah resmi membukukan saldo neraca/laba-rugi. <em>Unposted</em> berarti jurnal sudah ada di GL namun pembukuannya tertunda/hold.</li>
+        </ul>
+    </div>
+    
+    <!-- Kolom 2: Tim IT / Developer -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-top:3px solid #4338ca; border-radius:6px; padding:10px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <h4 style="font-size:10.5px; color:#4338ca; margin:0 0 6px; font-weight:800; display:flex; align-items:center; gap:5px;">💻 Glosari Tim IT &amp; Developer (Technical &amp; Reliability)</h4>
+        <ul style="margin:0; padding-left:14px; font-size:8.8px; color:#334155; line-height:1.4;">
+            <li style="margin-bottom:5px;"><strong>Concurrent Program / Manager:</strong> Komponen latar belakang Oracle EBS yang menjalankan program batch otomatis, ETL data, dan laporan terjadwal.</li>
+            <li style="margin-bottom:5px;"><strong>P95 / P99 Latency (Persentil):</strong> <em>P95/P99</em> mengukur waktu penyelesaian untuk 95% atau 99% request tercepat. P99 adalah tolok ukur utama durasi terburuk (*worst-case*) guna mendeteksi bottleneck.</li>
+            <li style="margin-bottom:5px;"><strong>CPU Saturation (&gt;80% / &gt;90%):</strong> Kondisi saat prosesor server kehabisan kapasitas komputasi, yang dapat memicu antrean Concurrent Manager memanjang dan transaksi tertunda.</li>
+            <li style="margin-bottom:5px;"><strong>Parent &amp; Child Request:</strong> Program induk (seperti <em>Create Accounting</em>) yang otomatis meluncurkan beberapa proses pekerja cabang (seperti <em>Accounting Program</em>) secara paralel.</li>
+            <li><strong>Sweep Process:</strong> Siklus batch pembersihan untuk menyapu transaksi-transaksi menggantung pada akhir periode agar tidak tertinggal ke periode akuntansi berikutnya.</li>
+        </ul>
+    </div>
+</div>
+</section><section class="section" id="transactions" style="padding:14px 0 6px;"><div class="section-head" style="margin-bottom:8px;"><div><div class="section-kicker">Program Transactions</div><h2>Concurrent Job dan Latency Program</h2></div><div class="section-no">03</div></div><p class="section-intro" style="margin-bottom:10px;">Highlight difokuskan pada proses accounting, reporting, dan kliring. Total Hits {% if is_monthly %}bulanan{% else %}harian{% endif %}: {{ trx_total_hits }} records. Top Slowest &amp; Fastest diurutkan berdasarkan metrik persentil 95.</p>
+
+<h3 style="font-size: 11px; color: var(--navy); margin: 6px 0 4px; font-weight: 800;">🔄 Monitoring Program KLN (Kliring)</h3>
+<div class="table-wrap" style="margin-bottom: 10px;"><table class="wide" style="font-size:9px; line-height:1.2;"><thead><tr style="background:#f1f5f9;"><th style="padding:3px 6px; color:#334155;">Program Name</th><th class="right" style="padding:3px 6px; color:#334155;">Total Hit</th><th class="right" style="padding:3px 6px; color:#334155;">P99 (mnt)</th><th style="padding:3px 6px; width:65px; color:#334155; text-align:center;">Status</th></tr></thead><tbody>
 {% for row in trx_kln_rows %}
 <tr>
-    <td style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.program }}</td>
-    <td class="right" style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.hits }}</td>
-    <td class="right" style="padding:6px; border-bottom:1px solid #e2e8f0;">{{ row.p99 }}</td>
-    <td style="padding:6px; border-bottom:1px solid #e2e8f0;"><span class="badge {{ 'warning' if row.status == 'Warning' else 'healthy' }}">{{ row.status }}</span></td>
+    <td style="padding:3px 6px; border-bottom:1px solid #e2e8f0; font-weight:500;">{{ row.program }}</td>
+    <td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0;">{{ row.hits }}</td>
+    <td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0;">{{ row.p99 }}</td>
+    <td style="padding:3px 6px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ 'warning' if row.status == 'Warning' else 'healthy' }}">{{ row.status }}</span></td>
 </tr>
 {% endfor %}
 {% if not trx_kln_rows %}
-<tr><td colspan="4" style="text-align:center; padding:10px; font-size:10px; color:#64748b;">Tidak ada program KLN hari ini.</td></tr>
+<tr><td colspan="4" style="text-align:center; padding:6px; font-size:9px; color:#64748b;">Tidak ada program KLN hari ini.</td></tr>
 {% endif %}
 </tbody></table></div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+<h3 style="font-size:11px; color:var(--navy); margin:8px 0 4px; font-weight:800;">⚙️ Monitoring Program Utama EFS (Accounting &amp; GL)</h3>
+<div class="table-wrap" style="margin-bottom:10px;"><table class="wide" style="font-size:9px; line-height:1.2;"><thead><tr style="background:#f1f5f9;"><th style="padding:3px 6px; color:#334155;">Program Name</th><th class="right" style="padding:3px 6px; color:#334155;">Total Hit</th><th class="right" style="padding:3px 6px; color:#334155;">Normal</th><th class="right" style="padding:3px 6px; color:#334155;">Warning</th><th class="right" style="padding:3px 6px; color:#334155;">Error</th><th class="right" style="padding:3px 6px; color:#334155;">P95 (mnt)</th><th class="right" style="padding:3px 6px; color:#334155;">P99 (mnt)</th><th style="padding:3px 6px; width:65px; color:#334155; text-align:center;">Status</th></tr></thead><tbody>
+{% for row in trx_core_programs %}<tr><td style="padding:3px 6px; border-bottom:1px solid #e2e8f0; font-weight:600; color:#1e293b;">{{ row.program }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0;">{{ row.total_hit }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0; color:#16a34a;">{{ row.normal }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0; {% if row.warning > 0 %}color:#d97706; font-weight:bold;{% endif %}">{{ row.warning }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0; {% if row.error > 0 %}color:#dc2626; font-weight:bold;{% endif %}">{{ row.error }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0;">{{ row.p95 }}</td><td class="right" style="padding:3px 6px; border-bottom:1px solid #e2e8f0;">{{ row.p99 }}</td><td style="padding:3px 6px; border-bottom:1px solid #e2e8f0; text-align:center;"><span class="badge {{ row.status_class }}">{{ row.status }}</span></td></tr>
+{% if row.error_detail and row.error_detail != '-' %}{% if row.error > 0 %}<tr style="background:#fff1f2;"><td colspan="8" style="padding:2px 8px 3px 12px; font-size:8.5px; color:#9f1239; font-family:monospace; border-bottom:1px solid #fecdd3;">🚨 <strong>Error pada {{ row.program }}:</strong> {{ row.error_detail }}</td></tr>{% else %}<tr style="background:#fffbeb;"><td colspan="8" style="padding:2px 8px 3px 12px; font-size:8.5px; color:#b45309; font-family:monospace; border-bottom:1px solid #fde68a;">⚠️ <strong>Warning pada {{ row.program }}:</strong> {{ row.error_detail }}</td></tr>{% endif %}{% endif %}
+{% endfor %}{% if not trx_core_programs %}<tr><td colspan="8" style="text-align:center; padding:6px; font-size:9px; color:#64748b;">Data program utama tidak ditemukan.</td></tr>{% endif %}
+</tbody></table></div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; break-inside: avoid; page-break-inside: avoid;">
     <!-- Kiri: Fastest -->
-    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-        <h3 style="font-size: 11px; color: var(--green); margin: 0 0 8px; font-weight: 800;">🚀 Top 10 Fastest Programs</h3>
+    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+        <h3 style="font-size: 10px; color: var(--green); margin: 0 0 4px; font-weight: 800;">🚀 Top 10 Fastest Programs</h3>
         <div class="table-wrap" style="margin:0; box-shadow:none; border:1px solid #e5e7eb; border-radius: 4px;">
-            <table style="width: 100%; font-size: 9px; line-height: 1.1;">
-                <thead><tr style="background:#f0fdf4;"><th style="padding:4px 6px; color:#166534;">Program</th><th style="padding:4px 6px; color:#166534;" class="right">P95 (mnt)</th></tr></thead>
+            <table style="width: 100%; font-size: 8.5px; line-height: 1.15;">
+                <thead><tr style="background:#f0fdf4;"><th style="padding:2.5px 5px; color:#166534;">Program</th><th style="padding:2.5px 5px; color:#166534;" class="right">P95 (mnt)</th></tr></thead>
                 <tbody>
                 {% for row in trx_fastest_rows %}
-                <tr><td style="padding:4px 6px; border-bottom:1px solid #f0fdf4;">{{ row.program }}</td><td style="padding:4px 6px; border-bottom:1px solid #f0fdf4;" class="right">{{ row.p95 }}</td></tr>
+                <tr><td style="padding:2.5px 5px; border-bottom:1px solid #f0fdf4;">{{ row.program }}</td><td style="padding:2.5px 5px; border-bottom:1px solid #f0fdf4;" class="right">{{ row.p95 }}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -130,14 +241,14 @@
     </div>
     
     <!-- Kanan: Slowest -->
-    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-        <h3 style="font-size: 11px; color: var(--orange); margin: 0 0 8px; font-weight: 800;">🐢 Top 10 Slowest Programs</h3>
+    <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+        <h3 style="font-size: 10px; color: var(--orange); margin: 0 0 4px; font-weight: 800;">🐢 Top 10 Slowest Programs</h3>
         <div class="table-wrap" style="margin:0; box-shadow:none; border:1px solid #e5e7eb; border-radius: 4px;">
-            <table style="width: 100%; font-size: 9px; line-height: 1.1;">
-                <thead><tr style="background:#fff7ed;"><th style="padding:4px 6px; color:#9a3412;">Program</th><th style="padding:4px 6px; color:#9a3412;" class="right">P95 (mnt)</th></tr></thead>
+            <table style="width: 100%; font-size: 8.5px; line-height: 1.15;">
+                <thead><tr style="background:#fff7ed;"><th style="padding:2.5px 5px; color:#9a3412;">Program</th><th style="padding:2.5px 5px; color:#9a3412;" class="right">P95 (mnt)</th></tr></thead>
                 <tbody>
                 {% for row in trx_slowest_rows %}
-                <tr><td style="padding:4px 6px; border-bottom:1px solid #fff7ed;">{{ row.program }}</td><td style="padding:4px 6px; border-bottom:1px solid #fff7ed;" class="right">{{ row.p95 }}</td></tr>
+                <tr><td style="padding:2.5px 5px; border-bottom:1px solid #fff7ed;">{{ row.program }}</td><td style="padding:2.5px 5px; border-bottom:1px solid #fff7ed;" class="right">{{ row.p95 }}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -186,15 +297,25 @@
     </div>
 </div>
 
-</section><section class="section" id="gl"><div class="section-head"><div><div class="section-kicker">General Ledger Funnel</div><h2>Monitoring FAH sampai Posting GL</h2></div><div class="section-no">05</div></div><div class="kpis"><div class="kpi green"><div class="label">Masuk FAH</div><div class="value">{{ gl_total_masuk }}</div><div class="sub">Intake</div></div><div class="kpi {{ 'red' if gl_total_error != '0' else 'green' }}"><div class="label">FAH Error</div><div class="value">{{ gl_total_error }}</div><div class="sub">Source application</div></div><div class="kpi {{ 'red' if gl_total_not_accounted != '0' else 'green' }}"><div class="label">Not Accounted</div><div class="value">{{ gl_total_not_accounted }}</div><div class="sub">Create Accounting</div></div><div class="kpi orange"><div class="label">Posted GL</div><div class="value">{{ gl_total_posted }}</div><div class="sub">{{ gl_posted_rate }}% intake</div></div><div class="kpi {{ 'red' if gl_total_unposted != '0' else 'green' }}"><div class="label">Unposted GL</div><div class="value">{{ gl_total_unposted }}</div><div class="sub">Pending Post</div></div></div><div class="table-wrap"><table><thead><tr><th>Tahap</th><th>Rows</th><th>Keterangan</th><th>Status</th></tr></thead><tbody><tr><td>Masuk FAH</td><td>{{ gl_total_masuk }}</td><td>Total Intake</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>FAH Success</td><td>{{ gl_total_success }}</td><td>Berhasil divalidasi</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>FAH Error</td><td>{% if gl_total_error != '0' %}<span class="val-crit">{{ gl_total_error }}</span>{% else %}{{ gl_total_error }}{% endif %}</td><td>{% if gl_total_error != '0' %}<span class="val-crit">Gagal divalidasi</span>{% else %}Gagal divalidasi{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_error != '0' else 'healthy' }}">{% if gl_total_error != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr><tr><td>Status Lain/Validation</td><td>{{ gl_total_other }}</td><td>Kondisi lainnya</td><td><span class="badge neutral">Info</span></td></tr><tr><td>Not Accounted</td><td>{% if gl_total_not_accounted != '0' %}<span class="val-crit">{{ gl_total_not_accounted }}</span>{% else %}{{ gl_total_not_accounted }}{% endif %}</td><td>{% if gl_total_not_accounted != '0' %}<span class="val-crit">Gagal Jurnal</span>{% else %}Gagal Jurnal{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_not_accounted != '0' else 'healthy' }}">{% if gl_total_not_accounted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr><tr><td>Accounted</td><td>{{ gl_total_accounted }}</td><td>Sukses Jurnal</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Transferred to GL</td><td>{{ gl_total_transferred }}</td><td>Ditransfer</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Posted</td><td>{{ gl_total_posted }}</td><td>Selesai Posting</td><td><span class="badge healthy">Healthy</span></td></tr><tr><td>Unposted</td><td>{% if gl_total_unposted != '0' %}<span class="val-crit">{{ gl_total_unposted }}</span>{% else %}{{ gl_total_unposted }}{% endif %}</td><td>{% if gl_total_unposted != '0' %}<span class="val-crit">Belum diposting</span>{% else %}Belum diposting{% endif %}</td><td><span class="badge {{ 'critical' if gl_total_unposted != '0' else 'healthy' }}">{% if gl_total_unposted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr></tbody></table></div><div class="table-wrap"><table class="wide"><thead><tr><th>Application</th><th>Masuk FAH</th><th>FAH Error</th><th>Not Accounted</th><th>Posted</th><th>Unposted</th></tr></thead><tbody>
+</section><section class="section" id="gl"><div class="section-head"><div><div class="section-kicker">General Ledger Funnel</div><h2>Monitoring Alur Akuntansi End-to-End (FAH Intake s/d GL Posting)</h2></div><div class="section-no">05</div></div><div class="kpis"><div class="kpi green"><div class="label">Masuk FAH</div><div class="value">{{ gl_total_masuk }}</div><div class="sub">Intake</div></div><div class="kpi {{ 'red' if gl_total_error != '0' else 'green' }}"><div class="label">FAH Error</div><div class="value">{{ gl_total_error }}</div><div class="sub">Source application</div></div><div class="kpi {{ 'red' if gl_total_not_accounted != '0' else 'green' }}"><div class="label">Not Accounted</div><div class="value">{{ gl_total_not_accounted }}</div><div class="sub">Create Accounting</div></div><div class="kpi orange"><div class="label">Posted GL</div><div class="value">{{ gl_total_posted }}</div><div class="sub">{{ gl_posted_rate }}% intake</div></div><div class="kpi {{ 'red' if gl_total_unposted != '0' else 'green' }}"><div class="label">Unposted GL</div><div class="value">{{ gl_total_unposted }}</div><div class="sub">Pending Post</div></div></div><div class="table-wrap"><table><thead><tr><th>Tahap Alur Akuntansi</th><th class="right">Rows</th><th>Keterangan</th><th style="width:70px; text-align:center;">Status</th></tr></thead><tbody>
+<tr><td><strong>1. FAH Interface / Intake</strong> (Masuk FAH)</td><td class="right">{{ gl_total_masuk }}</td><td>Total Intake file transaksi sumber</td><td style="text-align:center;"><span class="badge healthy">Healthy</span></td></tr>
+<tr><td><strong>2. FAH Processing</strong> (FAH Success)</td><td class="right">{{ gl_total_success }}</td><td>Berhasil divalidasi struktur file</td><td style="text-align:center;"><span class="badge healthy">Healthy</span></td></tr>
+<tr><td><strong>2. FAH Processing</strong> (FAH Error)</td><td class="right">{% if gl_total_error != '0' %}<span class="val-crit">{{ gl_total_error }}</span>{% else %}{{ gl_total_error }}{% endif %}</td><td>Gagal divalidasi struktur file</td><td style="text-align:center;"><span class="badge {{ 'critical' if gl_total_error != '0' else 'healthy' }}">{% if gl_total_error != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr>
+<tr><td><strong>3. XLA Event Processing</strong> (Status Lain / Void)</td><td class="right">{{ gl_total_other }}</td><td>Kondisi lainnya / pending</td><td style="text-align:center;"><span class="badge neutral">Info</span></td></tr>
+<tr><td><strong>4. SLA Accounting</strong> (Accounted)</td><td class="right">{{ gl_total_accounted }}</td><td>Sukses terbentuk jurnal (Create Accounting)</td><td style="text-align:center;"><span class="badge healthy">Healthy</span></td></tr>
+<tr><td><strong>4. SLA Accounting</strong> (Not Accounted)</td><td class="right">{% if gl_total_not_accounted != '0' %}<span class="val-crit">{{ gl_total_not_accounted }}</span>{% else %}{{ gl_total_not_accounted }}{% endif %}</td><td>Gagal Jurnal (Menunggu aturan / sweep)</td><td style="text-align:center;"><span class="badge {{ 'critical' if gl_total_not_accounted != '0' else 'healthy' }}">{% if gl_total_not_accounted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr>
+<tr><td><strong>5. Transfer to GL</strong> (Transferred)</td><td class="right">{{ gl_total_transferred }}</td><td>Ditransfer ke GL Interface</td><td style="text-align:center;"><span class="badge healthy">Healthy</span></td></tr>
+<tr><td><strong>6. GL Posting</strong> (Posted)</td><td class="right">{{ gl_total_posted }}</td><td>Selesai posting ke saldo buku besar</td><td style="text-align:center;"><span class="badge healthy">Healthy</span></td></tr>
+<tr><td><strong>6. GL Posting</strong> (Unposted)</td><td class="right">{% if gl_total_unposted != '0' %}<span class="val-crit">{{ gl_total_unposted }}</span>{% else %}{{ gl_total_unposted }}{% endif %}</td><td>Jurnal tertunda / belum diposting</td><td style="text-align:center;"><span class="badge {{ 'critical' if gl_total_unposted != '0' else 'healthy' }}">{% if gl_total_unposted != '0' %}Critical{% else %}Healthy{% endif %}</span></td></tr>
+</tbody></table></div><div class="table-wrap"><table class="wide"><thead><tr><th>Application</th><th class="right">1. Masuk FAH (Intake)</th><th class="right">2. FAH Error (Pre-process)</th><th class="right">3. Not Accounted (SLA)</th><th class="right">4. Posted (GL)</th><th class="right">5. Unposted (GL)</th></tr></thead><tbody>
 {% for row in gl_app_rows %}
 <tr>
     <td>{{ row.name }}</td>
-    <td>{{ row.masuk_fah }}</td>
-    <td>{% if row.fah_error != '0' %}<span class="val-crit">{{ row.fah_error }}</span>{% else %}{{ row.fah_error }}{% endif %}</td>
-    <td>{% if row.not_accounted != '0' %}<span class="val-crit">{{ row.not_accounted }}</span>{% else %}{{ row.not_accounted }}{% endif %}</td>
-    <td>{{ row.posted }}</td>
-    <td>{% if row.unposted != '0' %}<span class="val-crit">{{ row.unposted }}</span>{% else %}{{ row.unposted }}{% endif %}</td>
+    <td class="right">{{ row.masuk_fah }}</td>
+    <td class="right">{% if row.fah_error != '0' %}<span class="val-crit">{{ row.fah_error }}</span>{% else %}{{ row.fah_error }}{% endif %}</td>
+    <td class="right">{% if row.not_accounted != '0' %}<span class="val-crit">{{ row.not_accounted }}</span>{% else %}{{ row.not_accounted }}{% endif %}</td>
+    <td class="right">{{ row.posted }}</td>
+    <td class="right">{% if row.unposted != '0' %}<span class="val-crit">{{ row.unposted }}</span>{% else %}{{ row.unposted }}{% endif %}</td>
 </tr>
 {% endfor %}
 </tbody></table></div>
@@ -249,21 +370,105 @@
         {% endif %}
     </div>
 </div>
-</section><section class="section" id="breakdown"><div class="section-head"><div><div class="section-kicker">Detailed Breakdown</div><h2>Breakdown Entity, Application, dan Event Class</h2></div><div class="section-no">06</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Event Class</th><th>Total</th><th>Processed</th><th>U</th><th>Unproc %</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+</section><section class="section" id="breakdown"><div class="section-head"><div><div class="section-kicker">Detailed Breakdown</div><h2>Breakdown Entity, Application, dan Event Class</h2></div><div class="section-no">06</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Event Class</th><th class="right">Total</th><th class="right">Processed</th><th class="right">U</th><th class="right">Unproc %</th><th class="right">Amount</th><th style="width:70px; text-align:center;">Status</th></tr></thead><tbody>
 {% for row in xla_entity_rows %}
 <tr>
-    <td>{{ row.code }}</td>
-    <td>{{ row.total }}</td>
-    <td>{{ row.processed }}</td>
-    <td>{{ row.unprocessed }}</td>
-    <td>{{ row.unproc_pct }}</td>
-    <td>{{ row.amount }}</td>
-    <td><span class="badge {% if row.status | upper == 'CRITICAL' %}critical{% elif row.status | upper == 'WARNING' %}warning{% else %}healthy{% endif %}">{{ row.status }}</span></td>
+    <td style="font-weight:600; color:#1e293b;">{{ row.code }}</td>
+    <td class="right">{{ row.total }}</td>
+    <td class="right">{{ row.processed }}</td>
+    <td class="right">
+        {% if row.unprocessed != '0' and row.unprocessed != '-' and row.unprocessed != 0 %}
+            {% if row.status | upper == 'CRITICAL' %}
+                <span style="color:#b91c1c; font-weight:700; background:#fee2e2; padding:1.5px 6px; border-radius:3px; border:1px solid #fca5a5;">{{ row.unprocessed }}</span>
+            {% else %}
+                <span style="color:#c2410c; font-weight:700; background:#ffedd5; padding:1.5px 6px; border-radius:3px; border:1px solid #fdba74;">{{ row.unprocessed }}</span>
+            {% endif %}
+        {% else %}
+            {{ row.unprocessed }}
+        {% endif %}
+    </td>
+    <td class="right">
+        {% if row.unproc_pct != '0.00%' and row.unproc_pct != '0.0%' and row.unproc_pct != '0%' and row.unproc_pct != '-' %}
+            {% if row.status | upper == 'CRITICAL' %}
+                <span style="color:#dc2626; font-weight:700;">{{ row.unproc_pct }}</span>
+            {% else %}
+                <span style="color:#ea580c; font-weight:700;">{{ row.unproc_pct }}</span>
+            {% endif %}
+        {% else %}
+            {{ row.unproc_pct }}
+        {% endif %}
+    </td>
+    <td class="right">{{ row.amount }}</td>
+    <td style="text-align:center;"><span class="badge {% if row.status | upper == 'CRITICAL' %}critical{% elif row.status | upper == 'WARNING' %}warning{% else %}healthy{% endif %}">{{ row.status }}</span></td>
 </tr>
 {% endfor %}
 </tbody></table></div>
-</section><section class="section" id="financial"><div class="section-head"><div><div class="section-kicker">Financial Footprint</div><h2>Distribusi Currency dan Line Type</h2></div><div class="section-no">07</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Currency</th><th>Count</th><th>Amount</th><th>Base Amount</th></tr></thead><tbody><tr><td>USD</td><td>17.699</td><td>-23.486.136,87</td><td>4.620.821.992,85</td></tr><tr><td>SGD</td><td>2.492</td><td>116.544,57</td><td>873.114.877,55</td></tr><tr><td>HKD</td><td>301</td><td>331.694,27</td><td>713.506.842,16</td></tr><tr><td>JPY</td><td>340</td><td>7.523.297,00</td><td>459.769.945,48</td></tr><tr><td>AUD</td><td>100</td><td>51.756,95</td><td>282.603.559,83</td></tr><tr><td>EUR</td><td>235</td><td>23.701,80</td><td>280.223.208,96</td></tr><tr><td>GBP</td><td>148</td><td>7.063,93</td><td>91.147.568,71</td></tr><tr><td>MYR</td><td>186</td><td>41.636,89</td><td>85.322.212,13</td></tr><tr><td>CNY</td><td>104</td><td>58.737,91</td><td>47.056.693,41</td></tr><tr><td>SAR</td><td>69</td><td>21.735,12</td><td>43.686.041,66</td></tr><tr><td>THB</td><td>31</td><td>69.454,10</td><td>23.844.494,16</td></tr><tr><td>KRW</td><td>75</td><td>2.585.221,23</td><td>18.310.118,34</td></tr><tr><td>CAD</td><td>2</td><td>1.910,00</td><td>623.310,00</td></tr><tr><td>AED</td><td>4</td><td>330,00</td><td>277.890,00</td></tr><tr><td>BND</td><td>2</td><td>223,00</td><td>271.983,00</td></tr><tr><td>TWD</td><td>2</td><td>800,00</td><td>46.100,00</td></tr><tr><td>NZD</td><td>1</td><td>160,00</td><td>160,00</td></tr><tr><td>IDR</td><td>2.043.234</td><td>-1.860.571.765.233,00</td><td>-1.860.571.765.233,00</td></tr><tr><td>BNI_LEDGER_IDR</td><td>2.065.025</td><td>-1.860.584.417.103,10</td><td>-1.853.031.138.234,78</td></tr></tbody></table></div>
-</section><section class="section" id="infra"><div class="section-head"><div><div class="section-kicker">Infrastructure Health</div><h2>Utilisasi Server dan Tren {% if is_monthly %}Bulanan{% else %}Harian{% endif %}</h2></div><div class="section-no">08</div></div><p class="section-intro">Ringkasan utilisasi dari {{ infra_hosts_summary|length }} node. Terdapat {{ infra_critical_count }} Critical dan {{ infra_warning_count }} Warning.</p><div class="table-wrap"><table class="wide"><thead><tr><th rowspan="2">Host / Server</th><th rowspan="2">Peran</th><th colspan="3">CPU</th><th colspan="3">Memory</th><th colspan="3">Disk</th><th rowspan="2">Status</th></tr><tr><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th></tr></thead><tbody>
+
+<div style="margin-top: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
+    <h3 style="color: var(--navy); margin: 0 0 8px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+        📖 Glosarium Alur Pemrosesan Akuntansi End-to-End (Data Pipeline EFS)
+    </h3>
+    <p style="margin: 0 0 10px; font-size: 9px; color: #475569; line-height: 1.35;">
+        Panduan tahapan siklus data transaksi dari aplikasi sumber (Intake) hingga resmi terbit dan dibukukan ke General Ledger (GL).
+    </p>
+
+    <!-- Visual 7-Stage Flow matching Gambar 2 -->
+    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;">
+        <div style="background: #ffffff; border-top: 3px solid var(--blue); padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: var(--blue);">1. INTAKE</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Masuk FAH:</b> File staging dari apps hulu.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid #0284c7; padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: #0284c7;">2. FAH PROCESS</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Validasi Format:</b> FAH Success vs Error.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid #8b5cf6; padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: #8b5cf6;">3. XLA EVENT</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Registrasi:</b> Event Class &amp; Stuck XLA.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid #d97706; padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: #d97706;">4. SLA ACCOUNT</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Create Account:</b> Accounted / Not Accounted.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid #6366f1; padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: #6366f1;">5. TRANSFER GL</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Interface GL:</b> Pengiriman jurnal accounted.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid #0d9488; padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: #0d9488;">6. GL IMPORT</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Journal Import:</b> Pembentukan header &amp; line GL.</div>
+        </div>
+        <div style="background: #ffffff; border-top: 3px solid var(--green); padding: 5px 6px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="font-size: 8.5px; font-weight: 800; color: var(--green);">7. GL POSTING</div>
+            <div style="font-size: 8px; color: #334155; margin-top: 2px;"><b>Posting Final:</b> Posted vs Unposted.</div>
+        </div>
+    </div>
+
+    <!-- Dual Explanations -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 8.5px; line-height: 1.35; color: #334155;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #0f766e; font-size: 9px;">📌 Tahap 1 - 4: Validasi &amp; Pembentukan Jurnal Subledger (SLA)</b>
+            <ul style="margin: 4px 0 0; padding-left: 14px;">
+                <li style="margin-bottom: 3px;"><b>Masuk FAH (Intake):</b> Volume data mentah transaksi hulu yang berhasil masuk ke staging table FAH.</li>
+                <li style="margin-bottom: 3px;"><b>FAH Processing (Validasi Format):</b> Data divalidasi struktur file &amp; header-nya. Sukses masuk antrean = <em>FAH Success</em>, data cacat = <em>FAH Error</em>.</li>
+                <li style="margin-bottom: 3px;"><b>Event Class &amp; Entity:</b> Klasifikasi jenis transaksi (misal: <code>DEP</code> = Simpanan/Tabungan, <code>LON</code> = Kredit/Pinjaman, <code>INVV</code> = Invoice Voucher). Data yang terhambat di status event masuk kategori <em>Stuck in XLA</em> atau <em>Entities Invalid</em>.</li>
+                <li><b>SLA Accounting (Create Accounting):</b> Proses penerjemahan event menjadi jurnal Debit-Kredit. Data lolos validasi tapi belum membentuk jurnal disebut <em>Not Accounted</em> (menunggu batch sweep / aturan akuntansi).</li>
+            </ul>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            <b style="color: #4338ca; font-size: 9px;">📌 Tahap 5 - 7: Pengiriman &amp; Pembukuan Buku Besar (GL)</b>
+            <ul style="margin: 4px 0 0; padding-left: 14px;">
+                <li style="margin-bottom: 3px;"><b>Transfer to GL:</b> Pemindahan jurnal yang sudah accounted dari tabel subledger ke antarmuka General Ledger (<em>GL_INTERFACE</em>).</li>
+                <li style="margin-bottom: 3px;"><b>GL Journal Import:</b> Program batch yang mengimpor data antarmuka menjadi entri jurnal General Ledger resmi siap posting.</li>
+                <li style="margin-bottom: 3px;"><b>Posted GL:</b> Jurnal yang telah resmi diposting dan membukukan perubahan saldo pada buku besar (<em>GL_BALANCES</em>).</li>
+                <li><b>Unposted GL:</b> Jurnal yang telah berada di modul GL namun status postingnya masih tertunda (<em>pending post</em> / menunggu persetujuan period close).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</section><section class="section" id="financial"><div class="section-head"><div><div class="section-kicker">Financial Footprint</div><h2>Distribusi Currency dan Line Type</h2></div><div class="section-no">07</div></div><div class="table-wrap"><table class="wide"><thead><tr><th>Currency</th><th>Count</th><th>Amount</th><th>Base Amount</th></tr></thead><tbody><tr><td>USD</td><td>17.699</td><td>-23.486.136,87</td><td>4.620.821.992,85</td></tr><tr><td>SGD</td><td>2.492</td><td>116.544,57</td><td>873.114.877,55</td></tr><tr><td>HKD</td><td>301</td><td>331.694,27</td><td>713.506.842,16</td></tr><tr><td>JPY</td><td>340</td><td>7.523.297,00</td><td>459.769.945,48</td></tr><tr><td>AUD</td><td>100</td><td>51.756,95</td><td>282.603.559,83</td></tr><tr><td>EUR</td><td>235</td><td>23.701,80</td><td>280.223.208,96</td></tr><tr><td>GBP</td><td>148</td><td>7.063,93</td><td>91.147.568,71</td></tr><tr><td>MYR</td><td>186</td><td>41.636,89</td><td>85.322.212,13</td></tr><tr><td>CNY</td><td>104</td><td>58.737,91</td><td>47.056.693,41</td></tr><tr><td>SAR</td><td>69</td><td>21.735,12</td><td>43.686.041,66</td></tr><tr><td>THB</td><td>31</td><td>69.454,10</td><td>23.844.494,16</td></tr><tr><td>KRW</td><td>75</td><td>2.585.221,23</td><td>18.310.118,34</td></tr><tr><td>CAD</td><td>2</td><td>1.910,00</td><td>623.310,00</td></tr><tr><td>AED</td><td>4</td><td>330,00</td><td>277.890,00</td></tr><tr><td>BND</td><td>2</td><td>223,00</td><td>271.983,00</td></tr><tr><td>TWD</td><td>2</td><td>800,00</td><td>46.100,00</td></tr><tr><td>NZD</td><td>1</td><td>160,00</td><td>160,00</td></tr><tr><td>IDR</td><td>2.043.234</td><td>-1.860.571.765.233,00</td><td>-1.860.571.765.233,00</td></tr><tr><td>BNI_LEDGER_IDR</td><td>2.065.025</td><td>-1.860.584.417.103,10</td><td>-1.853.031.138.234,78</td></tr></tbody></table></div></section><section class="section" id="infra"><div class="section-head"><div><div class="section-kicker">Infrastructure Health</div><h2>Utilisasi Server dan Tren {% if is_monthly %}Bulanan{% else %}Harian{% endif %}</h2></div><div class="section-no">08</div></div><p class="section-intro">Ringkasan utilisasi dari {{ infra_hosts_summary|length }} node. Terdapat {{ infra_critical_count }} Critical dan {{ infra_warning_count }} Warning.</p><div class="table-wrap"><table class="wide"><thead><tr><th rowspan="2">Host / Server</th><th rowspan="2">Peran</th><th colspan="3">CPU</th><th colspan="3">Memory</th><th colspan="3">Disk</th><th rowspan="2">Status</th></tr><tr><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th><th>Min</th><th>Avg</th><th>Max</th></tr></thead><tbody>
 {% for host, metrics in infra_hosts_summary.items() %}
 <tr>
     <td>{{ host }}</td>
@@ -274,9 +479,7 @@
     <td><span class="badge {% if metrics.status | upper == 'CRITICAL' %}critical{% elif metrics.status | upper == 'WARNING' %}warning{% else %}healthy{% endif %}">{{ metrics.status }}</span></td>
 </tr>
 {% endfor %}
-</tbody></table></div>
-</section><section class="section" id="impact"><div class="section-head"><div><div class="section-kicker">Business Context</div><h2>Dampak Proses Bisnis dan Reliability Scorecard</h2></div><div class="section-no">09</div></div><div class="table-wrap"><table><thead><tr><th>Temuan Teknis</th><th>Proses Terdampak</th><th>Potensi Dampak</th><th>Severity</th></tr></thead><tbody><tr><td>{{ xla_unprocessed }} residual XLA</td><td>Create Accounting dan final sweep</td><td>Backlog dapat menunda downstream accounting.</td><td><span class="badge {{ 'warning' if xla_unprocessed != '0' else 'healthy' }}">Sedang</span></td></tr><tr><td>Latency eksekusi concurrent</td><td>Pelaporan dan batch</td><td>Risiko keterlambatan proses dan laporan.</td><td><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">Cek Alert</span></td></tr><tr><td>{{ infra_critical_count }} node Infrastruktur Critical</td><td>Batch accounting dan reporting</td><td>Risiko contention pada beban puncak.</td><td><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">Tinggi</span></td></tr><tr><td>GL Posted {{ gl_posted_rate }}%; Unposted {{ gl_total_unposted }}</td><td>Posting GL</td><td>Posting selesai, tetapi leak upstream perlu ditindaklanjuti.</td><td><span class="badge {{ 'warning' if gl_total_unposted != '0' else 'healthy' }}">Sedang</span></td></tr></tbody></table></div>
-</section><section class="section" id="actions"><div class="section-head"><div><div class="section-kicker">Prioritized Remediation</div><h2>Prioritas Perbaikan dan Action Items</h2></div><div class="section-no">10</div></div><div class="actions"><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>Drain residual queue XLA</h3><p>Terdapat {{ xla_unprocessed }} antrian XLA yang harus diproses dan {{ xla_e }} error yang perlu diselesaikan.</p></div></div><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>RCA latency lintas layer</h3><p>Korelasikan program dengan waktu proses lama terhadap utilisasi CPU, wait event, top SQL, dan antrean Concurrent Manager.</p></div></div><div class="action p2"><div class="priority">P2<br/>Hari ini</div><div><h3>Rekonsiliasi GL leak</h3><p>Tindak lanjuti {{ gl_total_error }} FAH Error dan {{ gl_total_not_accounted }} Not Accounted.</p></div></div><div class="action"><div class="priority">P3<br/>Mingguan</div><div><h3>Capacity hygiene</h3><p>Lakukan pemantauan terhadap node dengan status peringatan ({{ infra_warning_count }} node) dan kritis ({{ infra_critical_count }} node).</p></div></div></div></section><section class="section" id="audit"><div class="section-head"><div><div class="section-kicker">Traceability &amp; QA</div><h2>Rekonsiliasi dan Kualitas Data</h2></div><div class="section-no">11</div></div><div class="table-wrap"><table class=""><thead><tr><th>Pemeriksaan</th><th>Hasil</th></tr></thead><tbody><tr><td>XLA status components vs source totals</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted + Not Accounted vs FAH Success</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Transferred + Stuck vs Accounted</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Posted + Unposted vs Transferred</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted DR = CR</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Blocking Not Accounted vs funnel</td><td><span class="badge neutral">CHECK</span></td></tr></tbody></table></div><div class="data-quality"><h3>Catatan Kualitas Data</h3><p>XLA memakai GL_DATE dan GL memakai CREATION_DATE, sehingga kedua populasi dilaporkan terpisah. Status P/U dan XLA code S/E/V merupakan dimensi berbeda dan tidak dijumlahkan langsung.</p></div></section>
+</tbody></table></div></section><section class="section" id="impact"><div class="section-head"><div><div class="section-kicker">Business Context</div><h2>Dampak Proses Bisnis dan Reliability Scorecard</h2></div><div class="section-no">09</div></div><div class="table-wrap"><table><thead><tr><th>Temuan Teknis</th><th>Proses Terdampak</th><th>Potensi Dampak</th><th>Severity</th></tr></thead><tbody><tr><td>{{ xla_unprocessed }} residual XLA</td><td>Create Accounting dan final sweep</td><td>Backlog dapat menunda downstream accounting.</td><td><span class="badge {{ 'warning' if xla_unprocessed != '0' else 'healthy' }}">Sedang</span></td></tr><tr><td>Latency eksekusi concurrent</td><td>Pelaporan dan batch</td><td>Risiko keterlambatan proses dan laporan.</td><td><span class="badge {{ 'critical' if overall_status == 'CRITICAL' else 'warning' }}">Cek Alert</span></td></tr><tr><td>{{ infra_critical_count }} node Infrastruktur Critical</td><td>Batch accounting dan reporting</td><td>Risiko contention pada beban puncak.</td><td><span class="badge {{ 'critical' if infra_critical_count > 0 else 'healthy' }}">Tinggi</span></td></tr><tr><td>GL Posted {{ gl_posted_rate }}%; Unposted {{ gl_total_unposted }}</td><td>Posting GL</td><td>Posting selesai, tetapi leak upstream perlu ditindaklanjuti.</td><td><span class="badge {{ 'warning' if gl_total_unposted != '0' else 'healthy' }}">Sedang</span></td></tr></tbody></table></div></section><section class="section" id="actions"><div class="section-head"><div><div class="section-kicker">Prioritized Remediation</div><h2>Prioritas Perbaikan dan Action Items</h2></div><div class="section-no">10</div></div><div class="actions"><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>Drain residual queue XLA</h3><p>Terdapat {{ xla_unprocessed }} antrian XLA yang harus diproses dan {{ xla_e }} error yang perlu diselesaikan.</p></div></div><div class="action p1"><div class="priority">P1<br/>Segera</div><div><h3>RCA latency lintas layer</h3><p>Korelasikan program dengan waktu proses lama terhadap utilisasi CPU, wait event, top SQL, dan antrean Concurrent Manager.</p></div></div><div class="action p2"><div class="priority">P2<br/>Hari ini</div><div><h3>Rekonsiliasi GL leak</h3><p>Tindak lanjuti {{ gl_total_error }} FAH Error dan {{ gl_total_not_accounted }} Not Accounted.</p></div></div><div class="action"><div class="priority">P3<br/>Mingguan</div><div><h3>Capacity hygiene</h3><p>Lakukan pemantauan terhadap node dengan status peringatan ({{ infra_warning_count }} node) dan kritis ({{ infra_critical_count }} node).</p></div></div></div></section><section class="section" id="audit"><div class="section-head"><div><div class="section-kicker">Traceability &amp; QA</div><h2>Rekonsiliasi dan Kualitas Data</h2></div><div class="section-no">11</div></div><div class="table-wrap"><table class=""><thead><tr><th>Pemeriksaan</th><th>Hasil</th></tr></thead><tbody><tr><td>XLA status components vs source totals</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted + Not Accounted vs FAH Success</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Transferred + Stuck vs Accounted</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Posted + Unposted vs Transferred</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Accounted DR = CR</td><td><span class="badge healthy">PASS</span></td></tr><tr><td>GL Blocking Not Accounted vs funnel</td><td><span class="badge neutral">CHECK</span></td></tr></tbody></table></div><div class="data-quality"><h3>Summary</h3><p>XLA memakai GL_DATE dan GL memakai CREATION_DATE, sehingga kedua populasi dilaporkan terpisah. Status P/U dan XLA code S/E/V merupakan dimensi berbeda dan tidak dijumlahkan langsung.</p></div></section>
 {% if is_monthly %}
 <section class="section" id="top10"><div class="section-head"><div><div class="section-kicker">Monthly Evidence</div><h2>EVIDENCE XLA - TOP 10 {{ report_date | upper }}</h2></div><div class="section-no">12</div></div>
 <div class="data-quality" style="margin-bottom: 20px;"><p>Tabel berikut diambil langsung dari sheet Top 10 pada XLA bulanan. Tabel berfungsi sebagai finding dan evidence untuk konsentrasi volume, error rate, dan residual Unprocessed.</p></div>
@@ -291,8 +494,7 @@
 <h3 style="font-size: 14px; margin-bottom: 8px;">12.3 Top 10 residual Unprocessed</h3>
 <div class="table-wrap"><table><thead><tr><th style="width: 50px;">#</th><th>Event Class</th><th style="text-align: right;">Unprocessed</th></tr></thead><tbody>
 {% for row in top10_unp %}<tr><td>{{ loop.index }}</td><td>{{ row.event }}</td><td style="text-align: right;">{{ row.value }}</td></tr>{% endfor %}
-</tbody></table></div>
-</section>
+</tbody></table></div></section>
 {% endif %}
 </main><footer class="foot"><span>{{ report_title | title }} | Confidential</span><span>Periode {{ report_date }} | Generated from validated Excel sources</span></footer>
 </div><script>
